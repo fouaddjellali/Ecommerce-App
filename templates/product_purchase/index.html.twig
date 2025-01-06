@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Achat du Produit{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Félicitations !</h4>
+        <p>Vous avez acheté le produit <strong>{{ product.name }}</strong> avec succès.</p>
+        <p class="mb-0"><strong>Prix payé :</strong> {{ product.price }} €</p>
+    </div>
+    <a href="{{ path('product_list') }}" class="btn btn-primary">Retour à la liste des produits</a>
+</div>
+{% endblock %}
