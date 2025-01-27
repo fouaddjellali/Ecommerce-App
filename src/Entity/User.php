@@ -4,11 +4,12 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,6 +18,7 @@ class User implements UserInterface
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
     #[Assert\Email]
+    #[Assert\NotBlank]
     private string $email;
 
     #[ORM\Column(type: 'string')]
@@ -26,9 +28,11 @@ class User implements UserInterface
     private array $roles = [];
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Assert\NotBlank]
     private string $firstName;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Assert\NotBlank]
     private string $lastName;
 
     #[ORM\Column(type: 'datetime')]
@@ -37,9 +41,10 @@ class User implements UserInterface
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->roles = ['ROLE_USER']; // Par défaut, chaque utilisateur a le rôle ROLE_USER
     }
 
-    // Getters and setters
+    // Getters et setters
 
     public function getId(): int
     {
@@ -70,12 +75,12 @@ class User implements UserInterface
 
     public function getRoles(): array
     {
-        // Par défaut, chaque utilisateur a le rôle ROLE_USER
-        $roles = $this->roles;
-        if (!in_array('ROLE_USER', $roles)) {
-            $roles[] = 'ROLE_USER';
+        // Assure que chaque utilisateur a au moins le rôle ROLE_USER
+        if (!in_array('ROLE_USER', $this->roles, true)) {
+            $this->roles[] = 'ROLE_USER';
         }
-        return $roles;
+
+        return $this->roles;
     }
 
     public function setRoles(array $roles): self
@@ -113,12 +118,37 @@ class User implements UserInterface
 
     public function getUserIdentifier(): string
     {
-        // Utilise l'email comme identifiant principal
+        // Utilise l'email comme identifiant unique
         return $this->email;
     }
 
     public function eraseCredentials(): void
     {
-        // Efface des données sensibles si nécessaire (non utilisé ici)
+        // Méthode vide pour effacer les données sensibles si nécessaire
+    }
+
+    // Helpers pour les rôles spécifiques
+    public function isAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->roles, true);
+    }
+
+    public function isBanned(): bool
+    {
+        return in_array('ROLE_BANNED', $this->roles, true);
+    }
+
+    public function addRole(string $role): self
+    {
+        if (!in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+        return $this;
+    }
+
+    public function removeRole(string $role): self
+    {
+        $this->roles = array_filter($this->roles, fn ($r) => $r !== $role);
+        return $this;
     }
 }
