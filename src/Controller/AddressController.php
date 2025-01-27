@@ -11,8 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/address')]
-final class AddressController extends AbstractController
-{
+final class AddressController extends AbstractController{
     #[Route(name: 'app_address_index', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager): Response
     {
