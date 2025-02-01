@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\CategoryRepository;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,15 +11,16 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(): Response
-    {
-        // Données dynamiques pour les catégories et les produits
-        $categories = ['Catégorie 1', 'Catégorie 2', 'Catégorie 3'];
-        $featuredProducts = [
-            ['name' => 'Produit 1', 'description' => 'Description du produit 1'],
-            ['name' => 'Produit 2', 'description' => 'Description du produit 2'],
-        ];
+    public function index(
+        CategoryRepository $categoryRepository,
+        ProductRepository $productRepository
+    ): Response {
+        // Récupérer toutes les catégories
+        $categories = $categoryRepository->findAll();
 
+        // Récupérer les produits en vedette (par exemple : où isFeatured = true)
+        $featuredProducts = $productRepository->findBy(['isFeatured' => true]);
+        dd($categories);
         return $this->render('home/index.html.twig', [
             'categories' => $categories,
             'featuredProducts' => $featuredProducts,

@@ -9,8 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-use Doctrine\ORM\EntityManagerInterface; // Import du gestionnaire d'entités
-use App\Entity\User; // Assurez-vous d'importer votre entité User
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\User; 
 
 class PasswordResetController extends AbstractController
 {

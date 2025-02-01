@@ -20,7 +20,7 @@ security:
                 login_path: login
                 check_path: login
                 always_use_default_target_path: true
-                default_target_path: / # Redirige vers la page d'accueil après connexion
+                default_target_path: / 
             logout:
                 path: logout
                 target: /
@@ -28,4 +28,4 @@ security:
 
     access_control:
         - { path: ^/logout$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, roles: PUBLIC_ACCESS } # Permet d'accéder aux pages sans être connecté
+        - { path: ^/, roles: PUBLIC_ACCESS } 

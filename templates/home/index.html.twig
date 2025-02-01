@@ -4,20 +4,27 @@
 
 {% block body %}
 <div class="container my-5">
+    <!-- En-tête -->
     <header class="text-center bg-light py-5 mb-4">
-        <h1 class="display-4">Bienvenue sur mon site e-commerce</h1>
-        <p class="lead">Découvrez nos produits et services !</p>
+        <h1 class="display-4">Bienvenue sur notre site e-commerce</h1>
+        <p class="lead">Découvrez nos produits et services exceptionnels !</p>
     </header>
 
+    <!-- Section Catégories -->
     <section class="mb-5">
         <h2 class="mb-3">Nos Catégories</h2>
         <ul class="list-group">
             {% for category in categories %}
-                <li class="list-group-item">{{ category }}</li>
+                <li class="list-group-item">
+                    {{ category.name }}
+                </li>
+            {% else %}
+                <li class="list-group-item">Aucune catégorie disponible pour le moment.</li>
             {% endfor %}
         </ul>
     </section>
 
+    <!-- Section Produits en Vedette -->
     <section>
         <h2 class="mb-3">Produits en Vedette</h2>
         <div class="row">
@@ -30,6 +37,8 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <p>Aucun produit en vedette pour le moment.</p>
             {% endfor %}
         </div>
     </section>
