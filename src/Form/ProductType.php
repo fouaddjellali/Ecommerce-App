@@ -20,11 +20,11 @@ class ProductType extends AbstractType
             ->add('stock')
             ->add('image')
             ->add('createdAt', null, [
-                'widget' => 'single_text',
+                'widget' => 'single_text'
             ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
-                'choice_label' => 'id',
+'choice_label' => 'id',
             ])
         ;
     }
