@@ -2,11 +2,13 @@ security:
     password_hashers:
         App\Entity\User:
             algorithm: auto
+
     providers:
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -17,10 +19,14 @@ security:
             form_login:
                 login_path: login
                 check_path: login
+                always_use_default_target_path: true
+                default_target_path: / # Redirige vers la page d'accueil après connexion
             logout:
                 path: logout
                 target: /
+            entry_point: form_login
+
     access_control:
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/logout$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, roles: ROLE_USER }
+        - { path: ^/, roles: PUBLIC_ACCESS } # Permet d'accéder aux pages sans être connecté
