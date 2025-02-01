@@ -1,6 +1,5 @@
 <?php
 
-// src/Controller/SecurityController.php
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +12,11 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+        // Vérifier si l'utilisateur est déjà connecté
+        if ($this->getUser()) {
+            return $this->redirectToRoute('home'); // Redirige vers la page d'accueil si connecté
+        }
+
         // Obtenir les erreurs de connexion et le dernier email saisi
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
@@ -26,7 +30,6 @@ class SecurityController extends AbstractController
     #[Route('/logout', name: 'logout', methods: ['GET'])]
     public function logout(): void
     {
-        // Symfony gère la déconnexion ici
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }
