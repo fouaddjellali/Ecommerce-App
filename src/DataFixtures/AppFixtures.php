@@ -3,14 +3,17 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
-use App\Entity\Category;
+use App\Entity\Customer;
+use App\Entity\LoyaltyCard;
 use App\Entity\Product;
-use App\Entity\Order;
-use App\Entity\OrderItem;
-use App\Entity\Review;
-use App\Entity\Address;
+use App\Entity\Category;
 use App\Entity\Cart;
 use App\Entity\CartItem;
+use App\Entity\Order;
+use App\Entity\OrderItem;
+use App\Entity\Payment;
+use App\Entity\Address;
+use App\Entity\Review;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -21,14 +24,14 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create();
 
-        // Stocker les références pour les relations
+        // Stockage des entités créées pour référence
         $users = [];
+        $customers = [];
         $categories = [];
         $products = [];
-        $carts = [];
 
-        // Créer des utilisateurs
-        for ($i = 0; $i < 10; $i++) {
+        // Création des utilisateurs
+        for ($i = 0; $i < 150; $i++) {
             $user = new User();
             $user->setEmail($faker->unique()->email)
                 ->setPassword(password_hash('password', PASSWORD_BCRYPT))
@@ -39,9 +42,49 @@ class AppFixtures extends Fixture
             $manager->persist($user);
             $users[] = $user;
         }
+        for ($i = 0; $i < 10; $i++) {
+            $user = new User();
+            $user->setEmail($faker->unique()->email)
+                ->setPassword(password_hash('password', PASSWORD_BCRYPT))
+                ->setRoles(['ROLE_BANNED'])
+                ->setFirstName($faker->firstName)
+                ->setLastName($faker->lastName);
 
-        // Créer des catégories
+            $manager->persist($user);
+            $users[] = $user;
+        }
+        for ($i = 0; $i < 10; $i++) {
+            $user = new User();
+            $user->setEmail($faker->unique()->email)
+                ->setPassword(password_hash('password', PASSWORD_BCRYPT))
+                ->setRoles(['ROLE_ADMIN'])
+                ->setFirstName($faker->firstName)
+                ->setLastName($faker->lastName);
+
+            $manager->persist($user);
+            $users[] = $user;
+        }
+
+        // Création des clients et de leurs cartes de fidélité
         for ($i = 0; $i < 5; $i++) {
+            $customer = new Customer();
+            $customer->setEmail($faker->unique()->email)
+                ->setPassword(password_hash('password', PASSWORD_BCRYPT))
+                ->setRoles(['ROLE_CUSTOMER'])
+                ->setFirstName($faker->firstName)
+                ->setLastName($faker->lastName);
+
+            $loyaltyCard = new LoyaltyCard();
+            $loyaltyCard->setCardNumber($faker->uuid)
+                ->setCustomer($customer);
+
+            $manager->persist($customer);
+            $manager->persist($loyaltyCard);
+            $customers[] = $customer;
+        }
+
+        // Création des catégories
+        for ($i = 0; $i < 3; $i++) {
             $category = new Category();
             $category->setName($faker->word)
                 ->setDescription($faker->sentence);
@@ -50,21 +93,65 @@ class AppFixtures extends Fixture
             $categories[] = $category;
         }
 
-        // Créer des produits
-        for ($i = 0; $i < 50; $i++) {
+        // Création des produits
+        for ($i = 0; $i < 10; $i++) {
             $product = new Product();
-            $product->setName($faker->word) // Remplacement de `productName` par `word`
-                ->setDescription($faker->paragraph)
-                ->setPrice($faker->randomFloat(2, 10, 200))
-                ->setStock($faker->numberBetween(1, 100))
-                ->setImage($faker->imageUrl(640, 480, 'technics'))
-                ->setCategory($faker->randomElement($categories));
+            $product->setName($faker->word)
+                ->setDescription($faker->sentence)
+                ->setPrice($faker->randomFloat(2, 5, 500))
+                ->setStock($faker->numberBetween(10, 100))
+                ->setCategory($categories[array_rand($categories)]);
 
             $manager->persist($product);
             $products[] = $product;
         }
 
-        // Créer des adresses pour les utilisateurs
+        // Création des paniers
+        foreach ($users as $user) {
+            $cart = new Cart();
+            $cart->setUser($user);
+            $manager->persist($cart);
+
+            // Ajout d'articles dans le panier
+            for ($j = 0; $j < rand(1, 3); $j++) {
+                $cartItem = new CartItem();
+                $cartItem->setCart($cart)
+                    ->setProduct($products[array_rand($products)])
+                    ->setQuantity(rand(1, 5));
+
+                $manager->persist($cartItem);
+            }
+        }
+
+        // Création des commandes
+        foreach ($customers as $customer) {
+            $order = new Order();
+            $order->setUser($customer)
+                ->setStatus('PENDING');
+
+            $manager->persist($order);
+
+            // Ajout d'articles à la commande
+            for ($j = 0; $j < rand(1, 3); $j++) {
+                $orderItem = new OrderItem();
+                $orderItem->setOrder($order)
+                    ->setProduct($products[array_rand($products)])
+                    ->setQuantity(rand(1, 5))
+                    ->setPrice($faker->randomFloat(2, 5, 500));
+
+                $manager->persist($orderItem);
+            }
+
+            // Création du paiement pour la commande
+            $payment = new Payment();
+            $payment->setOrder($order)
+                ->setPaymentMethod('Credit Card')
+                ->setAmount($orderItem->getPrice() * $orderItem->getQuantity());
+
+            $manager->persist($payment);
+        }
+
+        // Création des adresses
         foreach ($users as $user) {
             for ($i = 0; $i < 2; $i++) {
                 $address = new Address();
@@ -74,61 +161,22 @@ class AppFixtures extends Fixture
                     ->setState($faker->state)
                     ->setZipCode($faker->postcode)
                     ->setCountry($faker->country)
-                    ->setDefault($i === 0);
+                    ->setDefault($i === 0); // Première adresse par défaut
 
                 $manager->persist($address);
             }
         }
 
-        // Créer des avis pour les produits
-        foreach ($products as $product) {
-            for ($i = 0; $i < 5; $i++) {
+        // Création des avis
+        foreach ($customers as $customer) {
+            for ($i = 0; $i < 3; $i++) {
                 $review = new Review();
-                $review->setProduct($product)
-                    ->setUser($faker->randomElement($users))
-                    ->setRating($faker->numberBetween(1, 5))
+                $review->setUser($customer)
+                    ->setProduct($products[array_rand($products)])
+                    ->setRating(rand(1, 5))
                     ->setComment($faker->sentence);
 
                 $manager->persist($review);
-            }
-        }
-
-        // Créer des paniers pour les utilisateurs
-        foreach ($users as $user) {
-            $cart = new Cart();
-            $cart->setUser($user);
-
-            $manager->persist($cart);
-            $carts[] = $cart;
-
-            for ($i = 0; $i < 3; $i++) {
-                $cartItem = new CartItem();
-                $cartItem->setCart($cart)
-                    ->setProduct($faker->randomElement($products))
-                    ->setQuantity($faker->numberBetween(1, 5));
-
-                $manager->persist($cartItem);
-            }
-        }
-
-        // Créer des commandes
-        foreach ($users as $user) {
-            for ($i = 0; $i < 3; $i++) {
-                $order = new Order();
-                $order->setUser($user)
-                    ->setStatus($faker->randomElement(['Pending', 'Processing', 'Completed']));
-
-                $manager->persist($order);
-
-                for ($j = 0; $j < 3; $j++) {
-                    $orderItem = new OrderItem();
-                    $orderItem->setOrder($order)
-                        ->setProduct($faker->randomElement($products))
-                        ->setQuantity($faker->numberBetween(1, 5))
-                        ->setPrice($faker->randomFloat(2, 10, 200));
-
-                    $manager->persist($orderItem);
-                }
             }
         }
 
