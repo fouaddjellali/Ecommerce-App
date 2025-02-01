@@ -29,7 +29,7 @@ class Address
     #[ORM\Column(type: 'string', length: 10)]
     private string $zipCode;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(type: 'string')]
     private string $country;
 
     #[ORM\Column(type: 'boolean')]

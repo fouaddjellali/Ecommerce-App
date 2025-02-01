@@ -8,11 +8,15 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
+#[ORM\InheritanceType("SINGLE_TABLE")]
+#[ORM\DiscriminatorColumn(name: "discriminator", type: "string")]
+#[ORM\DiscriminatorMap(["user" => User::class, "customer" => Customer::class])]
 #[ORM\Table(name: 'users')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+
     #[ORM\Column(type: 'integer')]
     private int $id;
 
@@ -151,4 +155,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = array_filter($this->roles, fn ($r) => $r !== $role);
         return $this;
     }
+    
 }

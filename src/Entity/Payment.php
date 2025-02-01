@@ -51,18 +51,15 @@ class Payment
     {
         return $this->paymentMethod;
     }
-
     public function setPaymentMethod(string $paymentMethod): self
     {
         $this->paymentMethod = $paymentMethod;
         return $this;
     }
-
     public function getAmount(): float
     {
         return $this->amount;
     }
-
     public function setAmount(float $amount): self
     {
         $this->amount = $amount;
