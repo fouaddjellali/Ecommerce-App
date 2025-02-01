@@ -27,5 +27,4 @@ security:
             entry_point: form_login
 
     access_control:
-        - { path: ^/logout$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, roles: PUBLIC_ACCESS } # Permet d'accéder aux pages sans être connecté

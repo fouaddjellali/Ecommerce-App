@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250201165731 extends AbstractMigration
+final class Version20250201203043 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -24,13 +24,13 @@ final class Version20250201165731 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE cart_items_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE carts_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE categories_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE loyalty_cards_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE order_items_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE orders_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE payments_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE products_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE reviews_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE SEQUENCE users_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE addresses (id INT NOT NULL, user_id INT NOT NULL, street VARCHAR(255) NOT NULL, city VARCHAR(100) NOT NULL, state VARCHAR(100) NOT NULL, zip_code VARCHAR(10) NOT NULL, country VARCHAR(50) NOT NULL, is_default BOOLEAN NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE addresses (id INT NOT NULL, user_id INT NOT NULL, street VARCHAR(255) NOT NULL, city VARCHAR(100) NOT NULL, state VARCHAR(100) NOT NULL, zip_code VARCHAR(10) NOT NULL, country VARCHAR(255) NOT NULL, is_default BOOLEAN NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_6FCA7516A76ED395 ON addresses (user_id)');
         $this->addSql('CREATE TABLE cart_items (id INT NOT NULL, cart_id INT NOT NULL, product_id INT NOT NULL, quantity INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_BEF484451AD5CDBF ON cart_items (cart_id)');
@@ -38,6 +38,8 @@ final class Version20250201165731 extends AbstractMigration
         $this->addSql('CREATE TABLE carts (id INT NOT NULL, user_id INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_4E004AACA76ED395 ON carts (user_id)');
         $this->addSql('CREATE TABLE categories (id INT NOT NULL, name VARCHAR(255) NOT NULL, description TEXT DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE loyalty_cards (id INT NOT NULL, customer_id INT NOT NULL, card_number VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_AE34B8869395C3F3 ON loyalty_cards (customer_id)');
         $this->addSql('CREATE TABLE order_items (id INT NOT NULL, product_id INT NOT NULL, order_id INT NOT NULL, quantity INT NOT NULL, price NUMERIC(10, 2) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_62809DB04584665A ON order_items (product_id)');
         $this->addSql('CREATE INDEX IDX_62809DB08D9F6D38 ON order_items (order_id)');
@@ -50,7 +52,7 @@ final class Version20250201165731 extends AbstractMigration
         $this->addSql('CREATE TABLE reviews (id INT NOT NULL, product_id INT NOT NULL, user_id INT NOT NULL, rating INT NOT NULL, comment TEXT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_6970EB0F4584665A ON reviews (product_id)');
         $this->addSql('CREATE INDEX IDX_6970EB0FA76ED395 ON reviews (user_id)');
-        $this->addSql('CREATE TABLE users (id INT NOT NULL, email VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, roles JSON NOT NULL, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE users (id SERIAL NOT NULL, email VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, roles JSON NOT NULL, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, discriminator VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_1483A5E9E7927C74 ON users (email)');
         $this->addSql('CREATE TABLE messenger_messages (id BIGSERIAL NOT NULL, body TEXT NOT NULL, headers TEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, available_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, delivered_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_75EA56E0FB7336F0 ON messenger_messages (queue_name)');
@@ -71,6 +73,7 @@ final class Version20250201165731 extends AbstractMigration
         $this->addSql('ALTER TABLE cart_items ADD CONSTRAINT FK_BEF484451AD5CDBF FOREIGN KEY (cart_id) REFERENCES carts (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE cart_items ADD CONSTRAINT FK_BEF484454584665A FOREIGN KEY (product_id) REFERENCES products (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE carts ADD CONSTRAINT FK_4E004AACA76ED395 FOREIGN KEY (user_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE loyalty_cards ADD CONSTRAINT FK_AE34B8869395C3F3 FOREIGN KEY (customer_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB04584665A FOREIGN KEY (product_id) REFERENCES products (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE order_items ADD CONSTRAINT FK_62809DB08D9F6D38 FOREIGN KEY (order_id) REFERENCES orders (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE orders ADD CONSTRAINT FK_E52FFDEEA76ED395 FOREIGN KEY (user_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -88,16 +91,17 @@ final class Version20250201165731 extends AbstractMigration
         $this->addSql('DROP SEQUENCE cart_items_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE carts_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE categories_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE loyalty_cards_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE order_items_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE orders_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE payments_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE products_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE reviews_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE users_id_seq CASCADE');
         $this->addSql('ALTER TABLE addresses DROP CONSTRAINT FK_6FCA7516A76ED395');
         $this->addSql('ALTER TABLE cart_items DROP CONSTRAINT FK_BEF484451AD5CDBF');
         $this->addSql('ALTER TABLE cart_items DROP CONSTRAINT FK_BEF484454584665A');
         $this->addSql('ALTER TABLE carts DROP CONSTRAINT FK_4E004AACA76ED395');
+        $this->addSql('ALTER TABLE loyalty_cards DROP CONSTRAINT FK_AE34B8869395C3F3');
         $this->addSql('ALTER TABLE order_items DROP CONSTRAINT FK_62809DB04584665A');
         $this->addSql('ALTER TABLE order_items DROP CONSTRAINT FK_62809DB08D9F6D38');
         $this->addSql('ALTER TABLE orders DROP CONSTRAINT FK_E52FFDEEA76ED395');
@@ -109,6 +113,7 @@ final class Version20250201165731 extends AbstractMigration
         $this->addSql('DROP TABLE cart_items');
         $this->addSql('DROP TABLE carts');
         $this->addSql('DROP TABLE categories');
+        $this->addSql('DROP TABLE loyalty_cards');
         $this->addSql('DROP TABLE order_items');
         $this->addSql('DROP TABLE orders');
         $this->addSql('DROP TABLE payments');
