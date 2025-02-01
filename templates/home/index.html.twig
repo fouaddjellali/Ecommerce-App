@@ -13,7 +13,9 @@
         <h2 class="mb-3">Nos Catégories</h2>
         <ul class="list-group">
             {% for category in categories %}
-                <li class="list-group-item">{{ category }}</li>
+                <li class="list-group-item">{{ category.name }}</li>
+            {% else %}
+                <li class="list-group-item">Aucune catégorie disponible</li>
             {% endfor %}
         </ul>
     </section>
@@ -29,6 +31,10 @@
                             <p class="card-text">{{ product.description }}</p>
                         </div>
                     </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <p>Aucun produit en vedette</p>
                 </div>
             {% endfor %}
         </div>
