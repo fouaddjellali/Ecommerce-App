@@ -1,37 +1,51 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Category index{% endblock %}
+{% block title %}Liste des Catégories{% endblock %}
 
 {% block body %}
-    <h1>Category index</h1>
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4">Nos Catégories</h1>
+        <p class="lead text-muted">Découvrez toutes nos catégories disponibles.</p>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="row">
         {% for category in categories %}
-            <tr>
-                <td>{{ category.id }}</td>
-                <td>{{ category.name }}</td>
-                <td>{{ category.description }}</td>
-                <td>
-                    <a href="{{ path('app_category_show', {'id': category.id}) }}">show</a>
-                    <a href="{{ path('app_category_edit', {'id': category.id}) }}">edit</a>
-                </td>
-            </tr>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <img src="https://picsum.photos/400/250?random={{ category.id }}" class="card-img-top" alt="{{ category.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ path('app_category_show', {'id': category.id}) }}" class="text-dark text-decoration-none">
+                                {{ category.name }}
+                            </a>
+                        </h5>
+                        <p class="text-muted small">{{ category.description|slice(0, 80) }}...</p>
+                        <a href="{{ path('app_category_show', {'id': category.id}) }}" class="btn btn-sm btn-primary">Voir la catégorie</a>
+                        
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
+            <div class="col-12">
+                <p class="text-muted">Aucune catégorie disponible.</p>
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
+    </div>
 
-    <a href="{{ path('app_category_new') }}">Create new</a>
+    <!-- Boutons de navigation -->
+    <div class="mt-4">
+        <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
+            <i class="bi bi-house"></i> Retour à l'accueil
+        </a>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_category_new') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Ajouter une catégorie
+            </a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
