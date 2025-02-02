@@ -37,7 +37,7 @@
             </tr>
         </tbody>
     </table>
-
+<a href="{{ path('app_home') }}" class="btn btn-primary mb-3">Retour à l'accueil</a>
 {% if is_granted('ROLE_ADMIN') %}
     <a href="{{ path('app_product_index') }}">Back to list</a>
 

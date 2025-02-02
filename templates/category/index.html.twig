@@ -11,7 +11,7 @@
                 <th>Id</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>actions</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,20 +21,21 @@
                 <td>{{ category.name }}</td>
                 <td>{{ category.description }}</td>
                 <td>
-                    <a href="{{ path('app_category_show', {'id': category.id}) }}">show</a>
+                    <a href="{{ path('app_category_show', {'id': category.id}) }}">Show</a>
                     {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('app_category_edit', {'id': category.id}) }}">edit</a>
+                        <a href="{{ path('app_category_edit', {'id': category.id}) }}">Edit</a>
                     {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="4">No records found</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-{% if is_granted('ROLE_ADMIN') %}
-    <a href="{{ path('app_category_new') }}">Create new</a>
+<a href="{{ path('app_home') }}" class="btn btn-primary mb-3">Retour à l'accueil</a>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_category_new') }}">Create new</a>
     {% endif %}
 {% endblock %}
