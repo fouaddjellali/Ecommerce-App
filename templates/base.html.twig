@@ -54,6 +54,10 @@
                         <a href="{{ path('login') }}"><i data-feather="user"></i></a>
                     {% endif %}
                     <a href="{{ path('app_cart_index') }}"><i data-feather="shopping-cart"></i></a>
+                    {% if app.user %}
+                     <a href="{{ path('app_cart_user') }}" class="btn btn-secondary">Mon Panier</a>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
