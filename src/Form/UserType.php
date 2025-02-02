@@ -11,13 +11,15 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordConfirmType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\Extension\Core\Type\PasswordConfirmType;
 
 class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $options['user']; // Accéder à l'utilisateur actuel dans les options
+        
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Email',
@@ -42,8 +44,11 @@ class UserType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                 ]
-            ])
-            ->add('roles', ChoiceType::class, [
+            ]);
+
+        // Ajouter le champ des rôles seulement si l'utilisateur est administrateur
+        if ($user && in_array('ROLE_ADMIN', $user->getRoles())) {
+            $builder->add('roles', ChoiceType::class, [
                 'label' => 'Rôle',
                 'choices' => [
                     'Utilisateur' => 'ROLE_USER',
@@ -56,7 +61,22 @@ class UserType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                 ]
-            ])
+            ]);
+        } else {
+            // Si l'utilisateur n'est pas administrateur, ne pas afficher ce champ
+            $builder->add('roles', ChoiceType::class, [
+                'label' => 'Rôle',
+                'choices' => [
+                    'Utilisateur' => 'ROLE_USER',
+                ],
+                'expanded' => true,
+                'multiple' => true,
+                'disabled' => true, // Désactive le champ pour que l'utilisateur ne puisse pas modifier son rôle
+                'data' => ['ROLE_USER'], // Définit le rôle comme 'USER'
+            ]);
+        }
+
+        $builder
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer',
             ]);
@@ -66,6 +86,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'user' => null,  // Option pour passer l'utilisateur courant au formulaire
         ]);
     }
 }

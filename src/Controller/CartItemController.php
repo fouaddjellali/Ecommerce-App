@@ -3,19 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\CartItem;
-use App\Form\CartItemType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/cart/item')]
 final class CartItemController extends AbstractController
 {
-    #[Route(name: 'app_cart_item_index', methods: ['GET'])]
+    #[Route('', name: 'app_cart_item_index', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager): Response
     {
+        // Récupérer tous les éléments du panier
         $cartItems = $entityManager
             ->getRepository(CartItem::class)
             ->findAll();
@@ -48,6 +48,7 @@ final class CartItemController extends AbstractController
     #[Route('/{id}', name: 'app_cart_item_show', methods: ['GET'])]
     public function show(CartItem $cartItem): Response
     {
+        // Afficher l'élément du panier par ID
         return $this->render('cart_item/show.html.twig', [
             'cart_item' => $cartItem,
         ]);
@@ -74,7 +75,8 @@ final class CartItemController extends AbstractController
     #[Route('/{id}', name: 'app_cart_item_delete', methods: ['POST'])]
     public function delete(Request $request, CartItem $cartItem, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$cartItem->getId(), $request->getPayload()->getString('_token'))) {
+        // Suppression de l'élément du panier
+        if ($this->isCsrfTokenValid('delete'.$cartItem->getId(), $request->request->get('_token'))) {
             $entityManager->remove($cartItem);
             $entityManager->flush();
         }
