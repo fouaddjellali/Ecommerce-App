@@ -35,7 +35,7 @@
 						<!-- Formulaire pour ajouter au panier -->
 						<div class="mt-4">
 							{% if product.stock > 0 %}
-								<form action="{{ path('app_cart_add', {'id': product.id}) }}" method="POST">
+								<form action="{{ path('app_cart_item_add', {'id': product.id}) }}" method="POST">
 									<div class="input-group">
 										<input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ product.stock }}">
 										<button type="submit" class="btn btn-success">

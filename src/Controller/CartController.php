@@ -27,7 +27,7 @@ final class CartController extends AbstractController
     }
 
     #[Route('/add/{id}', name: 'app_cart_add', methods: ['POST'])]
-    public function addToCart(Product $product, Request $request, SessionInterface $session): Response
+    public function addToCart(Product $product, Request $request): Response
     {
         $quantity = $request->request->get('quantity', 1);
         $cart = $session->get('cart', []);
@@ -45,6 +45,8 @@ final class CartController extends AbstractController
 
         // Sauvegarder les modifications dans la session
         $session->set('cart', $cart);
+        
+        dd($cart);
 
         // Rediriger vers la page du panier ou la page du produit
         return $this->redirectToRoute('app_cart_index');

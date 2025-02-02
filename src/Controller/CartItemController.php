@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\CartItem;
+use App\Entity\Cart;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +45,39 @@ final class CartItemController extends AbstractController
             'cart_item' => $cartItem,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/add/{id}', name: 'app_cart_item_add', methods: ['POST'])]
+    public function addToCart(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $quantity = $request->request->get('quantity', 1);
+        
+        $cart = $entityManager
+            ->getRepository(Cart::class)
+            ->findOneBy(['user' => $this->getUser()]);
+
+        
+        $product = $entityManager
+            ->getRepository(Product::class)
+            ->find($request->attributes->get('id'));
+        
+        $cartItem = $entityManager
+            ->getRepository(CartItem::class)
+            ->findOneBy(['cart' => $cart, 'product' => $product]);
+
+        if ($cartItem) {
+            $cartItem->setQuantity($cartItem->getQuantity() + $quantity);
+        } else {
+            $cartItem = new CartItem();
+            $cartItem->setCart($cart);
+            $cartItem->setProduct($product);
+            $cartItem->setQuantity($quantity);
+        }
+
+        $entityManager->persist($cartItem);
+        $entityManager->flush();        
+
+        return $this->redirectToRoute('app_cart_user');
     }
 
     #[Route('/{id}', name: 'app_cart_item_show', methods: ['GET'])]
