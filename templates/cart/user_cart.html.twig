@@ -1,39 +1,53 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon Panier{% endblock %}
+{% block title %}Mon Panier
+{% endblock %}
 
 {% block body %}
-    <h1>Mon Panier</h1>
+	<div class="container mt-4">
+		<h1 class="mb-4 text-center">Mon Panier</h1>
 
-    {% if cart.items is empty %}
-        <p>Votre panier est vide.</p>
-    {% else %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Produit</th>
-                    <th>Quantité</th>
-                    <th>Prix Unitaire</th>
-                    <th>Total</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart.items %}
-                    <tr>
-                        <td>{{ item.product.name }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.product.price }} €</td>
-                        <td>{{ item.product.price * item.quantity }} €</td>
-                        <td>
-                            <form action="{{ path('app_cart_remove', {'id': item.id}) }}" method="POST">
-                                <button type="submit" class="btn btn-danger btn-sm">Retirer</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {# <a href="{{ path('app_checkout') }}" class="btn btn-primary">Passer à la caisse</a> #}
-    {% endif %}
+		{% if cart.items is empty %}
+			<div class="alert alert-warning text-center" role="alert">
+				Votre panier est vide.
+			</div>
+		{% else %}
+			<table class="table table-striped table-bordered">
+				<thead class="table-dark">
+					<tr>
+						<th scope="col">Produit</th>
+						<th scope="col">Quantité</th>
+						<th scope="col">Prix Unitaire</th>
+						<th scope="col">Total</th>
+						<th scope="col">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in cart.items %}
+						<tr>
+							<td>{{ item.product.name }}</td>
+							<td>{{ item.quantity }}</td>
+							<td>{{ item.product.price }}€</td>
+							<td>{{ item.product.price * item.quantity }}€</td>
+							<td>
+								<form action="{{ path('app_cart_user_item_add', {'itemId': item.id}) }}" method="POST" class="d-inline">
+									<button type="submit" class="btn btn-outline-success btn-sm">
+										Ajouter Quantité
+									</button>
+								</form>
+
+								<form action="{{ path('app_cart_user_item_delete', {'itemId': item.id}) }}" method="POST" class="d-inline">
+									<button type="submit" class="btn btn-outline-danger btn-sm">
+										{% if item.quantity > 1 %}Réduire{% else %}Retirer
+										{% endif %}
+									</button>
+								</form>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		{% endif %}
+	</div>
 {% endblock %}
