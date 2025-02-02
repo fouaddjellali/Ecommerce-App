@@ -13,7 +13,9 @@
         <h2 class="mb-3">Nos Catégories</h2>
         <ul class="list-group">
             {% for category in categories %}
-                <li class="list-group-item">{{ category.name }}</li>
+                <li class="list-group-item">
+                    <a href="{{ path('app_category_show', { 'id': category.id }) }}">{{ category.name }}</a>
+                </li>
             {% else %}
                 <li class="list-group-item">Aucune catégorie disponible</li>
             {% endfor %}
@@ -27,7 +29,9 @@
                 <div class="col-md-6">
                     <div class="card mb-4">
                         <div class="card-body">
-                            <h3 class="card-title">{{ product.name }}</h3>
+                            <h3 class="card-title">
+                                <a href="{{ path('app_product_show', { 'id': product.id }) }}">{{ product.name }}</a>
+                            </h3>
                             <p class="card-text">{{ product.description }}</p>
                         </div>
                     </div>
