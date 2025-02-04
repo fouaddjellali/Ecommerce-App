@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'orders')]
@@ -24,12 +26,15 @@ class Order
     private string $status;
 
     #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderItem::class, cascade: ['persist', 'remove'])]
-    private $items;
+    private Collection $items;
+
+    #[ORM\Column(type: 'string', length: 255, unique: true, nullable: true)]
+    private ?string $stripeSessionId = null;
 
     public function __construct()
     {
         $this->createdAt = new \DateTime();
-        $this->items = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->items = new ArrayCollection();
     }
 
     public function getId(): int
@@ -64,7 +69,7 @@ class Order
         return $this;
     }
 
-    public function getItems(): \Doctrine\Common\Collections\Collection
+    public function getItems(): Collection
     {
         return $this->items;
     }
@@ -83,10 +88,21 @@ class Order
     {
         if ($this->items->removeElement($item)) {
             if ($item->getOrder() === $this) {
-               // $item->setOrder(null!);
+                // $item->setOrder(null!);
             }
         }
 
+        return $this;
+    }
+
+    public function getStripeSessionId(): ?string
+    {
+        return $this->stripeSessionId;
+    }
+
+    public function setStripeSessionId(?string $stripeSessionId): self
+    {
+        $this->stripeSessionId = $stripeSessionId;
         return $this;
     }
 }

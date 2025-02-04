@@ -1,3 +1,7 @@
 controllers:
     resource: ../src/Controller/
     type: attribute
+stripe_checkout_page:
+    path: /paiement
+    controller: App\Controller\StripeController::checkout
+
