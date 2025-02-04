@@ -1,0 +1,80 @@
+{% extends 'dashboard/dashboardbase.html.twig' %}
+
+{% block title %}Gestion des Catégories{% endblock %}
+
+{% block body %}
+    <h1>Catégories</h1>
+
+    <!-- Barre d'ajout de catégorie -->
+    <div class="category-actions">
+        <input type="text" id="newCategoryName" class="ant-input" placeholder="Nom de la catégorie">
+        <button class="ant-btn ant-btn-primary" onclick="addCategory()">Ajouter</button>
+    </div>
+
+    <!-- Tableau des Catégories -->
+    <table id="categoriesTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="categoryList">
+            {% for category in categories %}
+                <tr id="category-{{ category.id }}">
+                    <td>{{ category.id }}</td>
+                    <td>{{ category.name }}</td>
+                    <td>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteCategory('{{ category.id }}')">Supprimer</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            $('#categoriesTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ catégories par page",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ catégories",
+                    "paginate": {
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+
+        function addCategory() {
+            let name = document.getElementById("newCategoryName").value;
+            if (name.trim() === "") {
+                alert("Veuillez entrer un nom de catégorie.");
+                return;
+            }
+
+            fetch('/dashboard/category/new', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name })
+            }).then(response => response.json()).then(data => {
+                location.reload();
+            }).catch(error => console.error('Erreur:', error));
+        }
+
+        function deleteCategory(id) {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) return;
+
+            fetch(`/dashboard/category/delete/${id}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(() => {
+                    document.getElementById(`category-${id}`).remove();
+                }).catch(error => console.error('Erreur:', error));
+        }
+    </script>
+{% endblock %}

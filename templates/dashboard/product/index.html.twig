@@ -1,0 +1,158 @@
+{% extends 'dashboard/dashboardbase.html.twig' %}
+
+{% block title %}Gestion des Produits{% endblock %}
+
+{% block body %}
+    <h1>Produits</h1>
+
+    <!-- Barre de Recherche et Filtre -->
+    <div class="search-filter-container">
+        <input type="text" id="searchProduct" placeholder="Rechercher un produit..." class="ant-input">
+        <select id="filterCategory" class="ant-select">
+            <option value="">Toutes les catégories</option>
+            {% for category in categories %}
+                <option value="{{ category.name }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <button class="ant-btn ant-btn-primary" onclick="openAddProductModal()">Ajouter un produit</button>
+    </div>
+
+    <!-- Tableau des Produits -->
+    <table id="productsTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prix</th>
+                <th>Stock</th>
+                <th>Catégorie</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productList">
+            {% for product in products %}
+                <tr id="product-{{ product.id }}">
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.price }}€</td>
+                    <td>{{ product.stock }}</td>
+                    <td>{{ product.category.name }}</td>
+                    <td>
+                        <button class="ant-btn ant-btn-link" onclick="openEditProductModal('{{ product.id }}', '{{ product.name }}', '{{ product.price }}', '{{ product.stock }}', '{{ product.category.name }}')">Modifier</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteProduct('{{ product.id }}')">Supprimer</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- MODAL Ajout & Modification -->
+    <div id="productModal" class="ant-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px;">
+        <div class="ant-modal-content">
+            <div class="ant-modal-header">
+                <h3 id="modalTitle">Ajouter un produit</h3>
+            </div>
+            <div class="ant-modal-body">
+                <input type="hidden" id="productId">
+                <input type="text" id="productName" placeholder="Nom du produit" class="ant-input">
+                <input type="number" id="productPrice" placeholder="Prix" class="ant-input">
+                <input type="number" id="productStock" placeholder="Stock" class="ant-input">
+                <select id="productCategory" class="ant-select">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ant-modal-footer">
+                <button class="ant-btn ant-btn-primary" onclick="saveProduct()">Enregistrer</button>
+                <button class="ant-btn ant-btn-danger" onclick="closeProductModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            $('#productsTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ produits par page",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ produits",
+                    "paginate": {
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+
+            document.getElementById('searchProduct').addEventListener('keyup', function() {
+                $('#productsTable').DataTable().search(this.value).draw();
+            });
+
+            document.getElementById('filterCategory').addEventListener('change', function() {
+                let value = this.value;
+                if (value === "") {
+                    $('#productsTable').DataTable().search('').draw();
+                } else {
+                    $('#productsTable').DataTable().search(value).draw();
+                }
+            });
+        });
+
+        function openAddProductModal() {
+            document.getElementById("modalTitle").innerText = "Ajouter un produit";
+            document.getElementById("productId").value = "";
+            document.getElementById("productName").value = "";
+            document.getElementById("productPrice").value = "";
+            document.getElementById("productStock").value = "";
+            document.getElementById("productCategory").value = "";
+            document.getElementById("productModal").style.display = "block";
+        }
+
+        function openEditProductModal(id, name, price, stock, category) {
+            document.getElementById("modalTitle").innerText = "Modifier le produit";
+            document.getElementById("productId").value = id;
+            document.getElementById("productName").value = name;
+            document.getElementById("productPrice").value = price;
+            document.getElementById("productStock").value = stock;
+            document.getElementById("productCategory").value = category;
+            document.getElementById("productModal").style.display = "block";
+        }
+
+        function closeProductModal() {
+            document.getElementById("productModal").style.display = "none";
+        }
+
+        function saveProduct() {
+            const id = document.getElementById("productId").value;
+            const name = document.getElementById("productName").value;
+            const price = document.getElementById("productPrice").value;
+            const stock = document.getElementById("productStock").value;
+            const category = document.getElementById("productCategory").value;
+
+            const url = id ? `/dashboard/product/edit/${id}` : "/dashboard/product/new";
+            const method = id ? "POST" : "POST";
+
+            fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, price, stock, category })
+            }).then(response => response.json()).then(data => {
+                location.reload();
+            }).catch(error => console.error('Erreur:', error));
+        }
+
+        function deleteProduct(id) {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return;
+
+            fetch(`/dashboard/product/delete/${id}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(() => {
+                    document.getElementById(`product-${id}`).remove();
+                }).catch(error => console.error('Erreur:', error));
+        }
+    </script>
+
+{% endblock %}

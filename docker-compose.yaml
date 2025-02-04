@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  ### MySQL Database ###
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_ecommerce
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerceapp
+    ports:
+      - "4000:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+ 
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: symfony_app
+    restart: always
+    working_dir: /var/www/symfony
+    volumes:
+      - .:/var/www/symfony
+    environment:
+      DATABASE_URL: "mysql://root:root@mysql:3306/ecommerceapp?serverVersion=8.0&charset=utf8mb4"
+      MAILER_DSN: "smtp://mailhog:1025"
+    depends_on:
+      - mysql
+      - mailhog
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_symfony
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/symfony
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog_service
+    restart: always
+    ports:
+      - "8025:8025"  # Interface web de MailHog
+      - "1025:1025"  #     
+
+volumes:
+  mysql_data:

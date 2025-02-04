@@ -1,0 +1,66 @@
+{% extends 'dashboard/dashboardbase.html.twig' %}
+
+{% block title %}Gestion des Avis{% endblock %}
+
+{% block body %}
+    <h1>Avis des Clients</h1>
+
+    <!-- Tableau des Avis -->
+    <table id="reviewsTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Utilisateur</th>
+                <th>Produit</th>
+                <th>Note</th>
+                <th>Commentaire</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="reviewList">
+            {% for review in reviews %}
+                <tr id="review-{{ review.id }}">
+                    <td>{{ review.id }}</td>
+                    <td>{{ review.user.getFirstName ~ ' ' ~ review.user.getLastName }}</td>
+                    <td>{{ review.product.getName }}</td>
+                    <td>{{ review.rating }}/5</td>
+                    <td>{{ review.comment }}</td>
+                    <td>{{ review.createdAt|date("d/m/Y H:i") }}</td>
+                    <td>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteReview('{{ review.id }}')">Supprimer</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            $('#reviewsTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ avis par page",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ avis",
+                    "paginate": {
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+
+        function deleteReview(reviewId) {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer cet avis ?")) return;
+
+            fetch(`/dashboard/review/delete/${reviewId}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(() => {
+                    document.getElementById(`review-${reviewId}`).remove();
+                }).catch(error => console.error('Erreur:', error));
+        }
+    </script>
+{% endblock %}

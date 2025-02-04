@@ -155,5 +155,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = array_filter($this->roles, fn ($r) => $r !== $role);
         return $this;
     }
+    private ?string $resetToken = null;
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
     
 }
