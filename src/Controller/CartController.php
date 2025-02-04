@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Entity\Cart;
 use App\Form\CartType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,6 +25,33 @@ final class CartController extends AbstractController
             'carts' => $carts,
         ]);
     }
+
+    #[Route('/add/{id}', name: 'app_cart_add', methods: ['POST'])]
+    public function addToCart(Product $product, Request $request): Response
+    {
+        $quantity = $request->request->get('quantity', 1);
+        $cart = $session->get('cart', []);
+
+        // Si le produit est déjà dans le panier, on augmente la quantité
+        if (isset($cart[$product->getId()])) {
+            $cart[$product->getId()]['quantity'] += $quantity;
+        } else {
+            // Sinon, on l'ajoute au panier
+            $cart[$product->getId()] = [
+                'product' => $product,
+                'quantity' => $quantity
+            ];
+        }
+
+        // Sauvegarder les modifications dans la session
+        $session->set('cart', $cart);
+        
+        dd($cart);
+
+        // Rediriger vers la page du panier ou la page du produit
+        return $this->redirectToRoute('app_cart_index');
+    }
+
 
     #[Route('/new', name: 'app_cart_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

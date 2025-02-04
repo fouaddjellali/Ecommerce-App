@@ -31,13 +31,35 @@ class CategoryController extends AbstractController
             return new JsonResponse(['message' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
         }
 
-        $category = new Category();
-        $category->setName($data['name']);
+        return $this->render('category/new.html.twig', [
+            'category' => $category,
+            'form' => $form,
+        ]);
+    }
+    #[Route('/{id}', name: 'app_category_show', methods: ['GET'])]
+    public function show(Category $category, EntityManagerInterface $entityManager): Response
+    {
+        $products = $category->getProducts();
+
+        return $this->render('category/show.html.twig', [
+            'category' => $category,
+            'products' => $products,  
+        ]);
+    }
+    #[Route('/{id}/edit', name: 'app_category_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Category $category, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(CategoryType::class, $category);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
 
         $entityManager->persist($category);
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Catégorie ajoutée'], Response::HTTP_CREATED);
+        }
     }
 
     #[Route('/delete/{id}', name: 'category_delete', methods: ['DELETE'])]

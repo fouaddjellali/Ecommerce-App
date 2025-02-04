@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4">Mon Profil</h1>
+        <p class="lead text-muted">Voici vos informations personnelles. Vous pouvez les modifier.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Détails de l'utilisateur</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Id</dt>
+                        <dd class="col-sm-9">{{ user.id }}</dd>
+
+                        <dt class="col-sm-3">Email</dt>
+                        <dd class="col-sm-9">{{ user.email }}</dd>
+
+                        <dt class="col-sm-3">Prénom</dt>
+                        <dd class="col-sm-9">{{ user.firstName }}</dd>
+
+                        <dt class="col-sm-3">Nom</dt>
+                        <dd class="col-sm-9">{{ user.lastName }}</dd>
+
+                        <dt class="col-sm-3">Roles</dt>
+                        <dd class="col-sm-9">{{ user.roles ? user.roles|json_encode : 'Aucun rôle attribué' }}</dd>
+
+                        <dt class="col-sm-3">Date de création</dt>
+                        <dd class="col-sm-9">{{ user.createdAt ? user.createdAt|date('Y-m-d H:i:s') : 'Non précisé' }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            {% if app.user == user %}
+            <div class="mt-4 d-flex justify-content-between">
+                <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Modifier mes informations
+                </a>
+
+                {{ include('user/_delete_form.html.twig') }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="{{ path('app_user_index') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left-circle"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+{% endblock %}

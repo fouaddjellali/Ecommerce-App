@@ -30,18 +30,22 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ path('app_home') }}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_category_index') }}">Categories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_product_index') }}">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_cart_index') }}">Cart</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_order_index') }}">Orders</a>
-                    </li>
+             
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_category_index') }}">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_product_index') }}">Products</a>
+                </li>
+                   {% if is_granted('ROLE_ADMIN') %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_cart_index') }}">Cart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_order_index') }}">Orders</a>
+                </li>
+            {% endif %}
+
                 </ul>
                 <div class="speed-menu">
                     {% if app.user %}
@@ -50,6 +54,10 @@
                         <a href="{{ path('login') }}"><i data-feather="user"></i></a>
                     {% endif %}
                     <a href="{{ path('app_cart_index') }}"><i data-feather="shopping-cart"></i></a>
+                    {% if app.user %}
+                     <a href="{{ path('app_cart_user') }}" class="btn btn-secondary">Mon Panier</a>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
