@@ -1,0 +1,103 @@
+{% extends 'dashboard/dashboardbase.html.twig' %}
+
+{% block title %}Liste des Utilisateurs{% endblock %}
+
+{% block body %}
+    <h1>Liste des Utilisateurs</h1>
+
+    <table id="usersTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Rôles</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.lastName }}</td>
+                    <td>{{ user.firstName }}</td>
+                    <td>
+                        {% for role in user.roles %}
+                            <span class="badge bg-info">{{ role }}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if user.isBanned %}
+                            <span class="badge bg-danger">Bloqué</span>
+                        {% else %}
+                            <span class="badge bg-success">Actif</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{{ path('user_block', {'id': user.id}) }}">
+                            <button class="btn btn-warning" type="submit">
+                                {% if user.isBanned %}Débloquer{% else %}Bloquer{% endif %}
+                            </button>
+                        </form>
+          <button class="btn btn-primary" onclick="openRoleModal('{{ user.id }}', '{{ user.roles|json_encode|escape('js') }}')">Gérer les rôles</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal pour gérer les rôles -->
+    <div id="roleModal" class="modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);">
+        <h3>Modifier les rôles</h3>
+        <form id="roleForm" method="post">
+            <input type="hidden" id="userId" name="id">
+            <label><input type="checkbox" name="roles[]" value="ROLE_USER"> Utilisateur</label><br>
+            <label><input type="checkbox" name="roles[]" value="ROLE_ADMIN"> Administrateur</label><br>
+            <button type="submit" class="btn btn-success">Enregistrer</button>
+            <button type="button" class="btn btn-secondary" onclick="closeRoleModal()">Annuler</button>
+        </form>
+    </div>
+
+    <!-- Script pour activer DataTables et gérer le modal -->
+    <script>
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "lengthMenu": "Afficher _MENU_ utilisateurs par page",
+                    "zeroRecords": "Aucun utilisateur trouvé",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ utilisateurs",
+                    "infoEmpty": "Aucun utilisateur disponible",
+                    "infoFiltered": "(filtré sur _MAX_ utilisateurs au total)",
+                    "search": "Rechercher :",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+
+        function openRoleModal(userId, userRoles) {
+            document.getElementById("userId").value = userId;
+            document.getElementById("roleForm").action = "/dashboard/user/update-role/" + userId;
+
+            document.querySelectorAll("#roleModal input[type='checkbox']").forEach(input => {
+                input.checked = userRoles.includes(input.value);
+            });
+
+            document.getElementById("roleModal").style.display = "block";
+        }
+
+        function closeRoleModal() {
+            document.getElementById("roleModal").style.display = "none";
+        }
+    </script>
+{% endblock %}
