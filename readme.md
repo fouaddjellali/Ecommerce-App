@@ -6,8 +6,8 @@ Bienvenue sur le projet de site e-commerce dédié à la vente de portes. Ce pro
 
 ### 1. Cloner le projet
 ```bash
-git clone <URL_DU_REPO>
-cd <NOM_DU_REPO>
+git clone https://github.com/fouaddjellali/Ecommerce-App.git
+cd Ecommerce-App/
 ```
 
 ### 2. Lancer les services Docker
@@ -42,4 +42,4 @@ http://localhost
 - Symfony
 - Doctrine ORM
 - Docker & Docker Compose
-- MySQL (via Docker)
+- PostgreSQL (via Docker)
