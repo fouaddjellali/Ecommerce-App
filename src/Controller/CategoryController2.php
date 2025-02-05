@@ -46,12 +46,18 @@ final class CategoryController2 extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_category_show', methods: ['GET'])]
-    public function show(Category $category): Response
+    public function show(Category $category, EntityManagerInterface $entityManager): Response
     {
+        $products = $entityManager
+            ->getRepository(\App\Entity\Product::class)
+            ->findBy(['category' => $category]);
+    
         return $this->render('category/show.html.twig', [
             'category' => $category,
+            'products' => $products,
         ]);
     }
+    
 
     #[Route('/{id}/edit', name: 'app_category_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Category $category, EntityManagerInterface $entityManager): Response
