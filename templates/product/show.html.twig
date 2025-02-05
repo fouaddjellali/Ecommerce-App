@@ -32,24 +32,29 @@
 						<p class="text-muted small">Ajouté le :
 							{{ product.createdAt ? product.createdAt|date('d/m/Y H:i') : 'Non disponible' }}</p>
 
-						<!-- Formulaire pour ajouter au panier -->
-						<div class="mt-4">
-							{% if product.stock > 0 %}
-								<form action="{{ path('app_cart_item_add', {'id': product.id}) }}" method="POST">
-									<div class="input-group">
-										<input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ product.stock }}">
-										<button type="submit" class="btn btn-success">
-											<i class="bi bi-cart-plus"></i>
-											Ajouter au Panier
-										</button>
-									</div>
-								</form>
-							{% else %}
-								<button class="btn btn-secondary" disabled>
-									Rupture de stock
-								</button>
-							{% endif %}
-						</div>
+				<!-- Formulaire pour ajouter au panier -->
+<div class="mt-4">
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        {% if product.stock > 0 %}
+            <form action="{{ path('app_cart_item_add', {'id': product.id}) }}" method="POST">
+                <div class="input-group">
+                    <input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ product.stock }}">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-cart-plus"></i>
+                        Ajouter au Panier
+                    </button>
+                </div>
+            </form>
+        {% else %}
+            <button class="btn btn-secondary" disabled>
+                Rupture de stock
+            </button>
+        {% endif %}
+    {% else %}
+        <p class="text-muted">Veuillez <a href="{{ path('login') }}">vous connecter</a> pour ajouter ce produit au panier.</p>
+    {% endif %}
+</div>
+
 
 						<!-- Boutons d'action -->
 						<div class="mt-4">
