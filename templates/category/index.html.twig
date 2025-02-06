@@ -9,24 +9,25 @@
         <p class="lead text-muted">Découvrez toutes nos catégories disponibles.</p>
     </div>
 
-    <div class="row">
-        {% for category in categories %}
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 mb-4">
-                    <img src="https://picsum.photos/400/250?random={{ category.id }}" class="card-img-top" alt="{{ category.name }}">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{{ path('app_category_show', {'id': category.id}) }}" class="text-dark text-decoration-none">
-                                {{ category.name }}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for category in categories %}
+                <div class="col">
+                    <div class="card shadow-sm border-0 h-100 d-flex flex-column p-4">
+                        <div class="card-body flex-grow-1 text-center">
+                            <h5 class="card-title">
+                                <a href="{{ path('app_category_show', {'id': category.id}) }}" class="text-dark text-decoration-none fw-bold">
+                                    {{ category.name }}
+                                </a>
+                            </h5>
+                            <p class="text-muted small">{{ category.description|slice(0, 80) }}...</p>
+                        </div>
+                        <div class="text-center">
+                            <a href="{{ path('app_category_show', {'id': category.id}) }}" class="btn btn-sm btn-dark">
+                                Voir la catégorie
                             </a>
-                        </h5>
-                        <p class="text-muted small">{{ category.description|slice(0, 80) }}...</p>
-                        <a href="{{ path('app_category_show', {'id': category.id}) }}" class="btn btn-sm btn-dark">Voir la catégorie</a>
-                        
-                       
+                        </div>
                     </div>
                 </div>
-            </div>
         {% else %}
             <div class="col-12">
                 <p class="text-muted">Aucune catégorie disponible.</p>
