@@ -13,80 +13,42 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\PasswordConfirmType;
-
 class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $user = $options['user']; // Accéder à l'utilisateur actuel dans les options
-        
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-                'constraints' => [
-                    new NotBlank(),
-                ]
-            ])
-            ->add('password', PasswordType::class, [
-                'label' => 'Mot de passe',
+                'attr' => ['class' => 'form-control'], // Ajout de Bootstrap
                 'constraints' => [
                     new NotBlank(),
                 ]
             ])
             ->add('firstName', TextType::class, [
                 'label' => 'Prénom',
+                'attr' => ['class' => 'form-control'], // Ajout de Bootstrap
                 'constraints' => [
                     new NotBlank(),
                 ]
             ])
             ->add('lastName', TextType::class, [
                 'label' => 'Nom de famille',
+                'attr' => ['class' => 'form-control'], // Ajout de Bootstrap
                 'constraints' => [
                     new NotBlank(),
                 ]
-            ]);
-
-        // Ajouter le champ des rôles seulement si l'utilisateur est administrateur
-        if ($user && in_array('ROLE_ADMIN', $user->getRoles())) {
-            $builder->add('roles', ChoiceType::class, [
-                'label' => 'Rôle',
-                'choices' => [
-                    'Utilisateur' => 'ROLE_USER',
-                    'Administrateur' => 'ROLE_ADMIN',
-                    'Banni' => 'ROLE_BANNED',
-                ],
-                'expanded' => true,
-                'multiple' => true,
-                'required' => true,
-                'constraints' => [
-                    new NotBlank(),
-                ]
-            ]);
-        } else {
-            // Si l'utilisateur n'est pas administrateur, ne pas afficher ce champ
-            $builder->add('roles', ChoiceType::class, [
-                'label' => 'Rôle',
-                'choices' => [
-                    'Utilisateur' => 'ROLE_USER',
-                ],
-                'expanded' => true,
-                'multiple' => true,
-                'disabled' => true, // Désactive le champ pour que l'utilisateur ne puisse pas modifier son rôle
-                'data' => ['ROLE_USER'], // Définit le rôle comme 'USER'
-            ]);
-        }
-
-        $builder
+            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer',
+                'attr' => ['class' => 'btn btn-dark w-100 text-white mt-2'], 
             ]);
     }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'user' => null,  // Option pour passer l'utilisateur courant au formulaire
+            'user' => null,  
         ]);
     }
 }

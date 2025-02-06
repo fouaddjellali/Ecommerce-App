@@ -19,12 +19,10 @@ final class UserController extends AbstractController
         $users = $entityManager
             ->getRepository(User::class)
             ->findAll();
-
         return $this->render('user/index.html.twig', [
             'users' => $users,
         ]);
     }
-
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -35,34 +33,49 @@ final class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($user);
             $entityManager->flush();
-
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
-
         return $this->render('user/new.html.twig', [
             'user' => $user,
             'form' => $form,
         ]);
     }
-
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
     public function show(User $user): Response
     {
+        $currentUser = $this->getUser(); 
+        if (!$currentUser) {
+            throw $this->createAccessDeniedException("Vous devez être connecté pour accéder à cette page.");
+        }
+        if ($currentUser->getId() !== $user->getId()) {
+            throw $this->createAccessDeniedException("Accès refusé : vous ne pouvez voir que vos propres informations.");
+        }
         return $this->render('user/show.html.twig', [
             'user' => $user,
         ]);
     }
-
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
+        $currentUser = $this->getUser(); // Récupérer l'utilisateur connecté
+
+        // Vérifier si l'utilisateur est connecté
+        if (!$currentUser) {
+            throw $this->createAccessDeniedException("Vous devez être connecté pour accéder à cette page.");
+        }
+
+        // Vérifier si l'ID de l'utilisateur connecté correspond à l'ID demandé
+        if ($currentUser->getId() !== $user->getId()) {
+            throw $this->createAccessDeniedException("Accès refusé : vous ne pouvez modifier que vos propres informations.");
+        }
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+            // Redirection vers la même page après mise à jour
+            return $this->redirectToRoute('app_user_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('user/edit.html.twig', [
@@ -70,6 +83,7 @@ final class UserController extends AbstractController
             'form' => $form,
         ]);
     }
+
 
     #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response

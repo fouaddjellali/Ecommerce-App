@@ -13,8 +13,6 @@ services:
       - "4000:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-
- 
   php:
     build:
       context: .
@@ -30,7 +28,6 @@ services:
     depends_on:
       - mysql
       - mailhog
-
   nginx:
     image: nginx:latest
     container_name: nginx_symfony
@@ -42,14 +39,26 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
-
   mailhog:
     image: mailhog/mailhog
-    container_name: mailhog_service
+    container_name: mailhog
     restart: always
     ports:
       - "8025:8025"  # Interface web de MailHog
-      - "1025:1025"  #     
-
+      - "1025:1025"  #
+  mercure:
+    image: dunglas/mercure
+    container_name: mercure
+    restart: always
+    environment:
+      MERCURE_PUBLISHER_JWT_KEY: "testKey"
+      MERCURE_SUBSCRIBER_JWT_KEY: "testKey"
+      MERCURE_EXTRA_DIRECTIVES: "cors_origins=*"
+      MERCURE_PUBLISH_ALLOWED_ORIGINS: "*"
+      SERVER_NAME: ":3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - php
 volumes:
   mysql_data:

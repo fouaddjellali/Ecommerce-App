@@ -1,7 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon Panier
-{% endblock %}
+{% block title %}Mon Panier{% endblock %}
 
 {% block body %}
 	<div class="container mt-4">
@@ -38,8 +37,7 @@
 
 								<form action="{{ path('app_cart_user_item_delete', {'itemId': item.id}) }}" method="POST" class="d-inline">
 									<button type="submit" class="btn btn-outline-danger btn-sm">
-										{% if item.quantity > 1 %}Réduire{% else %}Retirer
-										{% endif %}
+										{% if item.quantity > 1 %}Réduire{% else %}Retirer{% endif %}
 									</button>
 								</form>
 							</td>
@@ -48,6 +46,29 @@
 				</tbody>
 			</table>
 
+			<h3 class="text-end mt-4">Total du panier :
+				{{ cart.items|reduce((carry, item) => carry + (item.quantity * item.product.price), 0)|number_format(2, ',', ' ') }} €
+			</h3>
+
+			<!-- Bouton Paiement Stripe -->
+			<form action="{{ path('stripe_checkout') }}" method="POST" id="checkout-form">
+				<button type="submit" class="btn btn-success w-100">Payer avec Stripe</button>
+			</form>
+
 		{% endif %}
 	</div>
+
+	<script src="https://js.stripe.com/v3/"></script>
+	<script>
+	document.getElementById('checkout-form').addEventListener('submit', async function (event) {
+		event.preventDefault();
+		const response = await fetch("{{ path('stripe_checkout') }}", { method: "POST" });
+		const session = await response.json();
+
+		if (session.id) {
+			const stripe = Stripe("{{ stripe_public_key }}");
+			stripe.redirectToCheckout({ sessionId: session.id });
+		}
+	});
+	</script>
 {% endblock %}

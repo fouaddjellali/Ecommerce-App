@@ -16,17 +16,15 @@ class DashboardController extends AbstractController
         OrderRepository $orderRepository,
         ReviewRepository $reviewRepository
     ): Response {
-        // Récupérer les statistiques de la base de données
         $totalUsers = $userRepository->count([]);
         $totalProducts = $productRepository->count([]);
         $totalOrders = $orderRepository->count([]);
         $totalReviews = $reviewRepository->count([]);
-        // Récupération de l’évolution des utilisateurs sur les 6 derniers mois
         $userGrowth = $userRepository->getUserGrowthByMonth();
-        // Répartition des commandes par statut
         $orderStatusCounts = $orderRepository->getOrdersByStatus();
-        // Nombre de produits par catégorie
         $productsByCategory = $productRepository->getProductsByCategory();
+        $monthlyRevenues = $orderRepository->getMonthlyRevenues();
+        $reviewCounts = $reviewRepository->getReviewCountsByProduct();
         return $this->render('dashboard/index.html.twig', [
             'totalUsers' => $totalUsers,
             'totalProducts' => $totalProducts,
@@ -35,6 +33,8 @@ class DashboardController extends AbstractController
             'userGrowth' => json_encode($userGrowth),
             'orderStatusCounts' => json_encode($orderStatusCounts),
             'productsByCategory' => json_encode($productsByCategory),
+            'monthlyRevenues' => json_encode($monthlyRevenues),
+            'reviewCounts' => json_encode($reviewCounts),
         ]);
     }
 }

@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 namespace DoctrineMigrations;
-
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
@@ -16,7 +14,6 @@ final class Version20250202153054 extends AbstractMigration
     {
         return '';
     }
-
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
@@ -45,7 +42,6 @@ final class Version20250202153054 extends AbstractMigration
         $this->addSql('ALTER TABLE reviews ADD CONSTRAINT FK_6970EB0F4584665A FOREIGN KEY (product_id) REFERENCES products (id)');
         $this->addSql('ALTER TABLE reviews ADD CONSTRAINT FK_6970EB0FA76ED395 FOREIGN KEY (user_id) REFERENCES users (id)');
     }
-
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs

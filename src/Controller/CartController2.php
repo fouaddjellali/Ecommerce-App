@@ -17,7 +17,7 @@ final class CartController2 extends AbstractController
     {
         $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('login');
         }
 
         $cart = $entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
@@ -72,7 +72,7 @@ final class CartController2 extends AbstractController
     {
         $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('login');
         }
 
         $cart = $entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);

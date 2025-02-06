@@ -19,19 +19,16 @@ final class PaymentController extends AbstractController
         $payments = $entityManager
             ->getRepository(Payment::class)
             ->findAll();
-
         return $this->render('payment/index.html.twig', [
             'payments' => $payments,
         ]);
     }
-
     #[Route('/new', name: 'app_payment_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $payment = new Payment();
         $form = $this->createForm(PaymentType::class, $payment);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($payment);
             $entityManager->flush();

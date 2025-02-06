@@ -23,14 +23,10 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create();
-
-        // Stockage des entités créées pour référence
         $users = [];
         $customers = [];
         $categories = [];
         $products = [];
-
-        // Création des utilisateurs
         for ($i = 0; $i < 150; $i++) {
             $user = new User();
             $user->setEmail($faker->unique()->email)
@@ -38,7 +34,6 @@ class AppFixtures extends Fixture
                 ->setRoles(['ROLE_USER'])
                 ->setFirstName($faker->firstName)
                 ->setLastName($faker->lastName);
-
             $manager->persist($user);
             $users[] = $user;
         }
@@ -65,7 +60,6 @@ class AppFixtures extends Fixture
             $users[] = $user;
         }
 
-        // Création des clients et de leurs cartes de fidélité
         for ($i = 0; $i < 5; $i++) {
             $customer = new Customer();
             $customer->setEmail($faker->unique()->email)
@@ -92,8 +86,6 @@ class AppFixtures extends Fixture
             $manager->persist($category);
             $categories[] = $category;
         }
-
-        // Création des produits
         for ($i = 0; $i < 10; $i++) {
             $product = new Product();
             $product->setName($faker->word)
@@ -101,12 +93,9 @@ class AppFixtures extends Fixture
                 ->setPrice($faker->randomFloat(2, 5, 500))
                 ->setStock($faker->numberBetween(10, 100))
                 ->setCategory($categories[array_rand($categories)]);
-
             $manager->persist($product);
             $products[] = $product;
         }
-
-        // Création des paniers
         foreach ($users as $user) {
             $cart = new Cart();
             $cart->setUser($user);
@@ -122,16 +111,11 @@ class AppFixtures extends Fixture
                 $manager->persist($cartItem);
             }
         }
-
-        // Création des commandes
         foreach ($customers as $customer) {
             $order = new Order();
             $order->setUser($customer)
                 ->setStatus('PENDING');
-
             $manager->persist($order);
-
-            // Ajout d'articles à la commande
             for ($j = 0; $j < rand(1, 3); $j++) {
                 $orderItem = new OrderItem();
                 $orderItem->setOrder($order)
@@ -141,17 +125,12 @@ class AppFixtures extends Fixture
 
                 $manager->persist($orderItem);
             }
-
-            // Création du paiement pour la commande
             $payment = new Payment();
             $payment->setOrder($order)
                 ->setPaymentMethod('Credit Card')
                 ->setAmount($orderItem->getPrice() * $orderItem->getQuantity());
-
             $manager->persist($payment);
         }
-
-        // Création des adresses
         foreach ($users as $user) {
             for ($i = 0; $i < 2; $i++) {
                 $address = new Address();
@@ -161,13 +140,10 @@ class AppFixtures extends Fixture
                     ->setState($faker->state)
                     ->setZipCode($faker->postcode)
                     ->setCountry($faker->country)
-                    ->setDefault($i === 0); // Première adresse par défaut
-
+                    ->setDefault($i === 0);
                 $manager->persist($address);
             }
         }
-
-        // Création des avis
         foreach ($customers as $customer) {
             for ($i = 0; $i < 3; $i++) {
                 $review = new Review();

@@ -31,18 +31,20 @@ class ProductController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-
         if (!$data) {
             return new JsonResponse(['message' => 'Invalid data'], Response::HTTP_BAD_REQUEST);
         }
-
         $product = new Product();
         $product->setName($data['name']);
-        $product->setDescription($data['description']);
+        $product->setDescription('test');
         $product->setPrice((float) $data['price']);
         $product->setStock((int) $data['stock']);
-        $product->setCategory($entityManager->getRepository(Category::class)->find($data['category']));
+        $photoBase64 = $data['photo'] ?? null;
+        if ($photoBase64) {
+            $product->setPhoto($photoBase64);
+        }
 
+        $product->setCategory($entityManager->getRepository(Category::class)->find($data['category']));
         $entityManager->persist($product);
         $entityManager->flush();
 
@@ -57,9 +59,12 @@ class ProductController extends AbstractController
         if (!$data) {
             return new JsonResponse(['message' => 'Invalid data'], Response::HTTP_BAD_REQUEST);
         }
-
+        $photoBase64 = $data['photo'] ?? null;
+        if ($photoBase64) {
+            $product->setPhoto($photoBase64);
+        }
         $product->setName($data['name']);
-        $product->setDescription($data['description']);
+        //$product->setDescription($data['description']);
         $product->setPrice((float) $data['price']);
         $product->setStock((int) $data['stock']);
 

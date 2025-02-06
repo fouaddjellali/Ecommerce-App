@@ -7,7 +7,6 @@
 
     <!-- Barre de Recherche et Filtre -->
     <div class="search-filter-container">
-        <input type="text" id="searchProduct" placeholder="Rechercher un produit..." class="ant-input">
         <select id="filterCategory" class="ant-select">
             <option value="">Toutes les catégories</option>
             {% for category in categories %}
@@ -23,6 +22,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
+                <th>Photo</th>
                 <th>Prix</th>
                 <th>Stock</th>
                 <th>Catégorie</th>
@@ -34,6 +34,7 @@
                 <tr id="product-{{ product.id }}">
                     <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
+                    <td><img src="{{ product.photo }}" alt="Photo du produit" width="50"></td>
                     <td>{{ product.price }}€</td>
                     <td>{{ product.stock }}</td>
                     <td>{{ product.category.name }}</td>
@@ -57,9 +58,12 @@
                 <input type="text" id="productName" placeholder="Nom du produit" class="ant-input">
                 <input type="number" id="productPrice" placeholder="Prix" class="ant-input">
                 <input type="number" id="productStock" placeholder="Stock" class="ant-input">
-                <select id="productCategory" class="ant-select">
+                <input type="file" id="productPhoto" class="ant-input">
+                <img id="previewPhoto" src="" width="100" style="display: none; margin-top: 10px;">
+                <label>Choisir une catégorie</label>
+                <select placeholder="Selectione une catégorie" id="productCategory" class="ant-select">
                     {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        <option value="{{ category.id }}" default>{{ category.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -69,7 +73,6 @@
             </div>
         </div>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             $('#productsTable').DataTable({
@@ -86,21 +89,47 @@
                     }
                 }
             });
-
-            document.getElementById('searchProduct').addEventListener('keyup', function() {
-                $('#productsTable').DataTable().search(this.value).draw();
-            });
-
-            document.getElementById('filterCategory').addEventListener('change', function() {
-                let value = this.value;
-                if (value === "") {
-                    $('#productsTable').DataTable().search('').draw();
-                } else {
-                    $('#productsTable').DataTable().search(value).draw();
-                }
-            });
         });
-
+        function convertImageToBase64(file, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                callback(reader.result);
+            };
+        }
+        function saveProduct() {
+            const id = document.getElementById("productId").value;
+            const name = document.getElementById("productName").value;
+            const price = document.getElementById("productPrice").value;
+            const stock = document.getElementById("productStock").value;
+            const category = document.getElementById("productCategory").value;
+            const photoFile = document.getElementById("productPhoto").files[0];
+            if (photoFile) {
+                convertImageToBase64(photoFile, function (base64String) {
+                    sendProductData(id, name, price, stock, category, base64String);
+                });
+            } else {
+                sendProductData(id, name, price, stock, category, null);
+            }
+        }
+        function sendProductData(id, name, price, stock, category, photoBase64) {
+            const url = id ? `/dashboard/product/edit/${id}` : "/dashboard/product/new";
+            const method = "POST";
+            const data = {
+                name: name,
+                price: price,
+                stock: stock,
+                category: category,
+                photo: photoBase64
+            };
+            fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            }).then(response => response.json()).then(data => {
+                location.reload();
+            }).catch(error => console.error('Erreur:', error));
+        }
         function openAddProductModal() {
             document.getElementById("modalTitle").innerText = "Ajouter un produit";
             document.getElementById("productId").value = "";
@@ -110,49 +139,47 @@
             document.getElementById("productCategory").value = "";
             document.getElementById("productModal").style.display = "block";
         }
-
-        function openEditProductModal(id, name, price, stock, category) {
+         document.addEventListener("DOMContentLoaded", function() {
+            let table = $('#productsTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ produits par page",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ produits",
+                    "paginate": {
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+                function closeProductModal() {
+            document.getElementById("productModal").style.display = "none";
+        }
+        document.getElementById('filterCategory').addEventListener('change', function() {
+                let value = this.value;
+                if (value === "") {
+                    table.column(5).search('').draw();
+                } else {
+                    table.column(5).search(value).draw();
+                }
+            });
+        });
+        function openEditProductModal(id, name, price, stock, category, photo) {
             document.getElementById("modalTitle").innerText = "Modifier le produit";
             document.getElementById("productId").value = id;
             document.getElementById("productName").value = name;
             document.getElementById("productPrice").value = price;
             document.getElementById("productStock").value = stock;
             document.getElementById("productCategory").value = category;
+            if (photo) {
+                document.getElementById("previewPhoto").src = photo;
+                document.getElementById("previewPhoto").style.display = "block";
+            } else {
+                document.getElementById("previewPhoto").style.display = "none";
+            }
             document.getElementById("productModal").style.display = "block";
         }
-
-        function closeProductModal() {
-            document.getElementById("productModal").style.display = "none";
-        }
-
-        function saveProduct() {
-            const id = document.getElementById("productId").value;
-            const name = document.getElementById("productName").value;
-            const price = document.getElementById("productPrice").value;
-            const stock = document.getElementById("productStock").value;
-            const category = document.getElementById("productCategory").value;
-
-            const url = id ? `/dashboard/product/edit/${id}` : "/dashboard/product/new";
-            const method = id ? "POST" : "POST";
-
-            fetch(url, {
-                method: method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, price, stock, category })
-            }).then(response => response.json()).then(data => {
-                location.reload();
-            }).catch(error => console.error('Erreur:', error));
-        }
-
-        function deleteProduct(id) {
-            if (!confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return;
-
-            fetch(`/dashboard/product/delete/${id}`, { method: "DELETE" })
-                .then(response => response.json())
-                .then(() => {
-                    document.getElementById(`product-${id}`).remove();
-                }).catch(error => console.error('Erreur:', error));
-        }
     </script>
-
 {% endblock %}

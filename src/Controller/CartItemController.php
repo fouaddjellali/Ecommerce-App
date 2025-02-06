@@ -51,12 +51,15 @@ final class CartItemController extends AbstractController
     public function addToCart(Request $request, EntityManagerInterface $entityManager): Response
     {
         $quantity = $request->request->get('quantity', 1);
-        
+        $user = $this->getUser(); 
         $cart = $entityManager
             ->getRepository(Cart::class)
             ->findOneBy(['user' => $this->getUser()]);
-
-        
+        if (!$cart) {
+            $cart = new Cart();
+            $cart->setUser($user);
+            $entityManager->persist($cart);
+        }
         $product = $entityManager
             ->getRepository(Product::class)
             ->find($request->attributes->get('id'));
@@ -73,7 +76,6 @@ final class CartItemController extends AbstractController
             $cartItem->setProduct($product);
             $cartItem->setQuantity($quantity);
         }
-
         $entityManager->persist($cartItem);
         $entityManager->flush();        
 

@@ -8,7 +8,7 @@
     <!-- Ant Design CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.6/antd.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; }
         .dashboard-container { display: flex; height: 100vh; }
@@ -40,19 +40,26 @@
             '📦 Produits': 'product_index',
             '📜 Commandes': 'order_index',
             '📂 Catégories': 'category_index',
-            '⭐ Avis': 'review_index'
+            '⭐ Avis': 'review_index',
+            '🔙 Déconnecter': 'logout'
+
         } %}
         {% for name, route in entities %}
             <a href="{{ path(route) }}">{{ name }}</a>
         {% endfor %}
     </div>
-
-    <!-- Contenu principal -->
     <div class="content">
         <h1>Bienvenue sur le Dashboard</h1>
-
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+    <button id="notifButton" class="ant-btn ant-btn-primary">
+        🔔 Notifications (<span id="notifCount">0</span>)
+    </button>
+    <div id="notifDropdown" class="ant-dropdown-menu" style="display: none; position: absolute; background: white; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding: 10px; width: 250px;">
+        <ul id="notifList" style="list-style: none; padding: 0; margin: 0;"></ul>
+        <button id="markAsReadButton" class="ant-btn ant-btn-danger" style="width: 100%; margin-top: 10px;">Marquer comme lues</button>
+    </div>
+</div>
         {% block body %}
-        <!-- Statistiques en cartes -->
         <div class="stat-container">
             <div class="stat-card">
                 <h3>👤 Total Utilisateurs</h3>
@@ -71,8 +78,6 @@
                 <p>{{ totalReviews }}</p>
             </div>
         </div>
-
-        <!-- Graphiques (3 par ligne) -->
         <div class="charts-container">
             <div class="chart-box">
                 <div class="chart-title">📈 Croissance des Utilisateurs</div>
@@ -94,15 +99,12 @@
                 <div class="chart-title">💰 Revenus par Mois</div>
                 <canvas id="revenuesChart"></canvas>
             </div>
-            <div class="chart-box">
-                <div class="chart-title">🚀 Activité des Utilisateurs</div>
-                <canvas id="activityChart"></canvas>
-            </div>
+           
         </div>
         {% endblock %}
     </div>
 </div>
-
+  
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // 1️⃣ Graphique Croissance des Utilisateurs
@@ -148,46 +150,52 @@
             }
         });
 
-        // 4️⃣ Graphique Avis par Produit
-        new Chart(document.getElementById('reviewsChart'), {
-            type: 'polarArea',
-            data: {
-                labels: ['Produit A', 'Produit B', 'Produit C'],
-                datasets: [{
-                    data: [12, 19, 7],
-                    backgroundColor: ['#FF5733', '#28A745', '#007BFF']
-                }]
-            }
-        });
+         const reviewData = {{ reviewCounts|raw }};
 
-        // 5️⃣ Graphique Revenus par Mois
-        new Chart(document.getElementById('revenuesChart'), {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
-                datasets: [{
-                    label: 'Revenus (€)',
-                    data: [1200, 1500, 1800, 2200, 2500, 2700],
-                    borderColor: '#FF5733',
-                    fill: false
-                }]
-            }
-        });
+    const labels = [];
+    const data = [];
+    const colors = ['#FF5733', '#28A745', '#007BFF', '#FFC107', '#6F42C1', '#17A2B8']; // Couleurs aléatoires
 
-        // 6️⃣ Graphique Activité des Utilisateurs
-        new Chart(document.getElementById('activityChart'), {
-            type: 'radar',
-            data: {
-                labels: ['Login', 'Commandes', 'Avis', 'Ajouts au Panier'],
-                datasets: [{
-                    label: 'Activité',
-                    data: [40, 25, 15, 35],
-                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                    borderColor: '#007BFF'
-                }]
-            }
-        });
+    reviewData.forEach((item, index) => {
+        labels.push(item.productName);
+        data.push(item.reviewCount);
     });
+
+    new Chart(document.getElementById('reviewsChart'), {
+        type: 'polarArea',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors.slice(0, labels.length)
+            }]
+        }
+    });
+    const revenuesData = {{ monthlyRevenues|raw }};
+    const labels2 = [];
+    const data2 = [];
+    revenuesData.forEach(item => {
+        labels2.push(["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"][item.month - 1]);
+        data2.push(item.revenue);
+    });
+
+    new Chart(document.getElementById('revenuesChart'), {
+        type: 'line',
+        data: {
+            labels: labels2,
+            datasets: [{
+                label: 'Revenus (€)',
+                data: data2,
+                borderColor: '#FF5733',
+                fill: false
+            }]
+        }
+    });
+
+
+     
+    });
+
 </script>
 
 </body>

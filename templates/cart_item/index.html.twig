@@ -1,35 +1,51 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}CartItem index{% endblock %}
+{% block title %}Votre Panier{% endblock %}
 
 {% block body %}
-    <h1>CartItem index</h1>
+    <h1>Votre Panier</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Quantity</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for cart_item in cart_items %}
-            <tr>
-                <td>{{ cart_item.id }}</td>
-                <td>{{ cart_item.quantity }}</td>
-                <td>
-                    <a href="{{ path('app_cart_item_show', {'id': cart_item.id}) }}">show</a>
-                    <a href="{{ path('app_cart_item_edit', {'id': cart_item.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% if cart_items|length > 0 %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Quantité</th>
+                    <th>Prix Unitaire</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for cart_item in cart_items %}
+                <tr>
+                    <td>{{ cart_item.product.name }}</td>
+                    <td>{{ cart_item.quantity }}</td>
+                    <td>{{ cart_item.product.price|number_format(2, ',', ' ') }} €</td>
+                    <td>{{ (cart_item.quantity * cart_item.product.price)|number_format(2, ',', ' ') }} €</td>
+                    <td>
+                        <a href="{{ path('app_cart_item_edit', {'id': cart_item.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                        <form action="{{ path('app_cart_item_delete', {'id': cart_item.id}) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cart_item.id) }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <a href="{{ path('app_cart_item_new') }}">Create new</a>
+        <h3>Total du panier : 
+            {{ cart_items|reduce((carry, item) => carry + (item.quantity * item.product.price), 0)|number_format(2, ',', ' ') }} €
+        </h3>
+
+        <!-- Bouton Paiement Stripe -->
+        <form action="{{ path('stripe_checkout') }}" method="POST" id="checkout-form">
+            <button type="submit" class="btn btn-success">Payer avec Stripe</button>
+        </form>
+    {% else %}
+        <p>Votre panier est vide.</p>
+    {% endif %}
+
+    <a href="{{ path('app_product_index') }}" class="btn btn-primary">Continuer vos achats</a>
 {% endblock %}

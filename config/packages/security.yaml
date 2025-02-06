@@ -2,13 +2,11 @@ security:
     password_hashers:
         App\Entity\User:
             algorithm: auto
-
     providers:
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
-
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -25,6 +23,6 @@ security:
                 path: logout
                 target: /
             entry_point: form_login
-
     access_control:
-        - { path: ^/, roles: PUBLIC_ACCESS } # Permet d'accéder aux pages sans être connecté
+        - { path: ^/dashboard, roles: ROLE_ADMIN }
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY, allow_if: "not is_granted('ROLE_BANNED')" }
