@@ -46,6 +46,16 @@ services:
     ports:
       - "8025:8025"  # Interface web de MailHog
       - "1025:1025"  #
+  adminer:
+    image: adminer:latest
+    container_name: adminer_service
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+      ADMINER_DEFAULT_USERNAME: root
+      ADMINER_DEFAULT_PASSWORD: root
+    ports:
+      - "8081:8080"
   mercure:
     image: dunglas/mercure
     container_name: mercure

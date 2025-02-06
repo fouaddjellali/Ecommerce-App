@@ -27,6 +27,18 @@ class AppFixtures extends Fixture
         $customers = [];
         $categories = [];
         $products = [];
+        $categoriesData = [
+            "Portes Classiques" => "Portes en bois, métal, PVC pour intérieur et extérieur.",
+            "Portes Mystiques & Secrètes" => "Portes cachées, portes-bibliothèques, portes secrètes pour escape rooms.",
+            "Portes Thématiques" => "Portes inspirées de films, de jeux vidéo, de mythologies (porte médiévale, porte cyberpunk, porte steampunk).",
+            "Portes Miniatures" => "Pour décorer un jardin, un bureau, ou une maison de poupée.",
+            "Portes Célèbres" => "Répliques de portes iconiques (exemple : Porte du 10 Downing Street, Porte du Mordor, Porte des étoiles…).",
+            "Portes de Luxe" => "Portes en matériaux haut de gamme avec finitions exceptionnelles.",
+            "Portes Futuristes" => "Portes en verre intelligent, portes holographiques, portes connectées.",
+            "Portes Étranges" => "Portes biscornues, asymétriques, artistiques.",
+            "Portes Animales" => "Chatières, mini-portes pour animaux, tunnels secrets.",
+            "Portes d'Autrefois" => "Portes rustiques, vieilles portes restaurées, portes anciennes à la vente.",
+        ];
         for ($i = 0; $i < 150; $i++) {
             $user = new User();
             $user->setEmail($faker->unique()->email)
@@ -78,21 +90,35 @@ class AppFixtures extends Fixture
         }
 
         // Création des catégories
-        for ($i = 0; $i < 3; $i++) {
+        foreach ($categoriesData as $name => $description) {
             $category = new Category();
-            $category->setName($faker->word)
-                ->setDescription($faker->sentence);
-
+            $category->setName($name)
+                ->setDescription($description);
             $manager->persist($category);
-            $categories[] = $category;
+            $categories[$name] = $category;
         }
-        for ($i = 0; $i < 10; $i++) {
+
+        // Création des produits spécifiques
+        $productsData = [
+            ["Porte en chêne massif", 250.00, 50, "Portes Classiques"],
+            ["Porte secrète bibliothécaire", 500.00, 20, "Portes Mystiques & Secrètes"],
+            ["Porte futuriste", 450.00, 15, "Portes Thématiques"],
+            ["Mini porte de jardin en bois", 50.00, 100, "Portes Miniatures"],
+            ["Réplique de la Porte des étoiles", 1200.00, 5, "Portes Célèbres"],
+            ["Porte en verre trempé haut de gamme", 800.00, 10, "Portes de Luxe"],
+            ["Porte connectée intelligente", 1000.00, 8, "Portes Futuristes"],
+            ["Porte asymétrique design", 600.00, 12, "Portes Étranges"],
+            ["Chatière pour animaux en aluminium", 75.00, 30, "Portes Animales"],
+            ["Vieille porte restaurée", 400.00, 7, "Portes d'Autrefois"],
+        ];
+
+        foreach ($productsData as [$name, $price, $stock, $categoryName]) {
             $product = new Product();
-            $product->setName($faker->word)
+            $product->setName($name)
                 ->setDescription($faker->sentence)
-                ->setPrice($faker->randomFloat(2, 5, 500))
-                ->setStock($faker->numberBetween(10, 100))
-                ->setCategory($categories[array_rand($categories)]);
+                ->setPrice($price)
+                ->setStock($stock)
+                ->setCategory($categories[$categoryName]);
             $manager->persist($product);
             $products[] = $product;
         }

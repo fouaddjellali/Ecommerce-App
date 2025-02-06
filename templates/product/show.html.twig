@@ -12,10 +12,10 @@
 			<!-- Image du produit -->
 			<div class="col-md-6">
 				<div class="card shadow-sm border-0">
-					<img src="https://picsum.photos/600/400?random={{ product.id }}" class="card-img-top img-fluid rounded" alt="{{ product.name }}">
+					<img src="{{ product.photo ?: 'https://picsum.photos/400/300?random=' ~ product.id }}" class="card-img-top img-fluid rounded" alt="{{ product.name }}">
 				</div>
 			</div>
-
+			
 			<!-- Détails du produit -->
 			<div class="col-md-6">
 				<div class="card shadow-sm border-0">
