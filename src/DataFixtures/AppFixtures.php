@@ -27,18 +27,6 @@ class AppFixtures extends Fixture
         $customers = [];
         $categories = [];
         $products = [];
-        $categoriesData = [
-            "Portes Classiques" => "Portes en bois, métal, PVC pour intérieur et extérieur.",
-            "Portes Mystiques & Secrètes" => "Portes cachées, portes-bibliothèques, portes secrètes pour escape rooms.",
-            "Portes Thématiques" => "Portes inspirées de films, de jeux vidéo, de mythologies (porte médiévale, porte cyberpunk, porte steampunk).",
-            "Portes Miniatures" => "Pour décorer un jardin, un bureau, ou une maison de poupée.",
-            "Portes Célèbres" => "Répliques de portes iconiques (exemple : Porte du 10 Downing Street, Porte du Mordor, Porte des étoiles…).",
-            "Portes de Luxe" => "Portes en matériaux haut de gamme avec finitions exceptionnelles.",
-            "Portes Futuristes" => "Portes en verre intelligent, portes holographiques, portes connectées.",
-            "Portes Étranges" => "Portes biscornues, asymétriques, artistiques.",
-            "Portes Animales" => "Chatières, mini-portes pour animaux, tunnels secrets.",
-            "Portes d'Autrefois" => "Portes rustiques, vieilles portes restaurées, portes anciennes à la vente.",
-        ];
         for ($i = 0; $i < 150; $i++) {
             $user = new User();
             $user->setEmail($faker->unique()->email)
@@ -90,15 +78,20 @@ class AppFixtures extends Fixture
         }
 
         // Création des catégories
-        foreach ($categoriesData as $name => $description) {
+        $categoryNames = [
+            "Portes Classiques", "Portes Mystiques & Secrètes", "Portes Thématiques", "Portes Miniatures", 
+            "Portes Célèbres", "Portes de Luxe", "Portes Futuristes", "Portes Étranges", 
+            "Portes Animales", "Portes Anciennes"
+        ];
+        
+        foreach ($categoryNames as $categoryName) {
             $category = new Category();
-            $category->setName($name)
-                ->setDescription($description);
+            $category->setName($categoryName)
+                ->setDescription($faker->sentence);
             $manager->persist($category);
-            $categories[$name] = $category;
+            $categories[$categoryName] = $category;
         }
-
-        // Création des produits spécifiques
+        
         $productsData = [
             ["Porte en chêne massif", 250.00, 50, "Portes Classiques"],
             ["Porte secrète bibliothécaire", 500.00, 20, "Portes Mystiques & Secrètes"],
@@ -109,16 +102,30 @@ class AppFixtures extends Fixture
             ["Porte connectée intelligente", 1000.00, 8, "Portes Futuristes"],
             ["Porte asymétrique design", 600.00, 12, "Portes Étranges"],
             ["Chatière pour animaux en aluminium", 75.00, 30, "Portes Animales"],
-            ["Vieille porte restaurée", 400.00, 7, "Portes d'Autrefois"],
+            ["Vieille porte restaurée", 400.00, 7, "Portes Anciennes"],
         ];
-
+        
+        $productImages = [
+            "Porte en chêne massif" => "/assets/images/chene.png",
+            "Porte secrète bibliothécaire" => "/assets/images/secrete.png",
+            "Porte futuriste" => "/assets/images/futur.png",
+            "Mini porte de jardin en bois" => "/assets/images/jardin.png",
+            "Réplique de la Porte des étoiles" => "/assets/images/etoiles.png",
+            "Porte en verre trempé haut de gamme" => "/assets/images/verre.png",
+            "Porte connectée intelligente" => "/assets/images/connectee.png",
+            "Porte asymétrique design" => "/assets/images/asymetrique.png",
+            "Chatière pour animaux en aluminium" => "/assets/images/animaux.png",
+            "Vieille porte restaurée" => "/assets/images/vielle.png"
+        ];
+        
         foreach ($productsData as [$name, $price, $stock, $categoryName]) {
             $product = new Product();
             $product->setName($name)
                 ->setDescription($faker->sentence)
                 ->setPrice($price)
                 ->setStock($stock)
-                ->setCategory($categories[$categoryName]);
+                ->setCategory($categories[$categoryName])
+                ->setPhoto($productImages[$name] ?? "/assets/images/chene.png");
             $manager->persist($product);
             $products[] = $product;
         }
