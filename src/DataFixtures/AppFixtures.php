@@ -27,6 +27,16 @@ class AppFixtures extends Fixture
         $customers = [];
         $categories = [];
         $products = [];
+
+        $admin = new User();
+        $admin->setEmail('admin@example.com')
+              ->setPassword(password_hash('adminpassword', PASSWORD_BCRYPT))
+              ->setRoles(['ROLE_ADMIN'])
+              ->setFirstName('Admin')
+              ->setLastName('User');
+        $manager->persist($admin);
+        $users[] = $admin;
+        
         for ($i = 0; $i < 150; $i++) {
             $user = new User();
             $user->setEmail($faker->unique()->email)
