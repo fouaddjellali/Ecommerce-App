@@ -6,99 +6,101 @@
 <div class="container my-5">
 
     <!-- Carousel d'accueil -->
-<div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item active position-relative">
-            <img src="{{ asset('assets/images/accueil1.png') }}" class="d-block w-100" alt="E-commerce">
-            <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
-            <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white">
-                <h2 class="fw-bold">Ouvrez les portes d’un monde de possibilités</h2>
-                <p>Explorez un large choix de portes, du classique au futuriste</p>
+    <div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active position-relative">
+                <img src="{{ asset('assets/images/accueil1.png') }}" class="d-block w-100" alt="E-commerce">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+                <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white">
+                    <h2 class="fw-bold">Ouvrez les portes d’un monde de possibilités</h2>
+                    <p>Explorez un large choix de portes, du classique au futuriste</p>
+                </div>
+            </div>
+            <div class="carousel-item position-relative">
+                <img src="{{ asset('assets/images/accueil2.png') }}" class="d-block w-100" alt="Mode">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+                <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white">
+                    <h2 class="fw-bold">Des portes pour tous les styles et toutes les envies</h2>
+                    <p>Du design intemporel aux inspirations mythologiques, trouvez la porte qui vous correspond.</p>
+                </div>
+            </div>
+            <div class="carousel-item position-relative">
+                <img src="{{ asset('assets/images/accueil3.png') }}" class="d-block w-100" alt="Technologie">
+                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+                <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white">
+                    <h2 class="fw-bold">Les portes du futur s’ouvrent à vous</h2>
+                    <p>Portes connectées, holographiques ou invisibles, la nouvelle ère est là.</p>
+                </div>
             </div>
         </div>
-        <div class="carousel-item position-relative">
-            <img src="{{ asset('assets/images/accueil2.png') }}" class="d-block w-100" alt="Mode">
-            <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
-            <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white">
-                <h2 class="fw-bold">Des portes pour tous les styles et toutes les envies</h2>
-                <p>Du design intemporel aux inspirations mythologiques, trouvez la porte qui vous correspond.</p>
-            </div>
-        </div>
-        <div class="carousel-item position-relative">
-            <img src="{{ asset('assets/images/accueil3.png') }}" class="d-block w-100" alt="Technologie">
-            <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
-            <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white">
-                <h2 class="fw-bold">Les portes du futur s’ouvrent à vous</h2>
-                <p>Portes connectées, holographiques ou invisibles, la nouvelle ère est là.</p>
-            </div>
-        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+        </button>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-    </button>
-</div>
 
     <!-- Section Catégories -->
     <section class="mb-5">
         <h2 class="text-center mb-4"><i class="bi bi-grid"></i> Nos Catégories</h2>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            {% for category in categories %}
-                <div class="col">
-                    <div class="card shadow-sm border-0 h-100 d-flex flex-column p-4">
-                        <div class="card-body flex-grow-1 text-center">
-                            <h5 class="card-title">
-                                <a href="{{ path('app_category_show', { 'id': category.id }) }}" class="text-decoration-none text-dark fw-bold">
-                                    {{ category.name }}
-                                </a>
-                            </h5>
-                            <p class="card-text text-muted">{{ category.description }}</p>
-                        </div>
-                        <div class="text-center">
+        <div class="row">
+            {% for category in categories|slice(0, 3) %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0 text-center p-4 h-100 d-flex flex-column">
+                        <h5 class="card-title">
+                            <a href="{{ path('app_category_show', { 'id': category.id }) }}" class="text-decoration-none text-dark fw-bold">
+                                {{ category.name }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted flex-grow-1">{{ category.description }}</p>
+                        <div class="mt-auto text-center">
                             <a href="{{ path('app_category_show', { 'id': category.id }) }}" class="btn btn-outline-primary">
                                 Explorer
                             </a>
                         </div>
                     </div>
                 </div>
-            {% else %}
-                <p class="text-center">Aucune catégorie disponible</p>
             {% endfor %}
         </div>
+        <div class="text-center mt-3">
+            <a href="{{ path('app_category_index') }}" class="btn btn-primary">Voir plus</a>
+        </div>
     </section>
+
     <!-- Section Produits en Vedette -->
     <section>
         <h2 class="text-center mb-4"><i class="bi bi-star-fill text-warning"></i> Produits en Vedette</h2>
         <div class="row">
-            {% for product in featuredProducts %}
+            {% for product in featuredProducts|slice(0, 3) %}
                 <div class="col-md-4">
-    <div class="card shadow-sm border-0 text-black h-100">
-        <div class="image-container">
-            <img src="{{ product.photo ?: 'https://picsum.photos/400/300?random=' ~ product.id }}" 
-                 class="card-img-top fixed-img" 
-                 height="200px"
-                 width="100px"
-                 alt="{{ product.name }}">
-        </div>
-        <div class="card-body d-flex flex-column">
-            <h5 class="card-title">
-                <a href="{{ path('app_product_show', { 'id': product.id }) }}" class="text-decoration-none text-black">
-                    {{ product.name }}
-                </a>
-            </h5>
-            <p class="card-text text-muted flex-grow-1">{{ product.description }}</p>
-            <a href="{{ path('app_product_show', { 'id': product.id }) }}" class="btn btn-primary btn-dark mt-auto">
-                Voir le produit
-            </a>
-        </div>
-    </div>
-</div>
-
-            {% else %}
-                <p class="text-center">Aucun produit en vedette</p>
+                    <div class="card shadow-sm border-0 text-black h-100 d-flex flex-column">
+                        <div class="image-container">
+                            <img src="{{ product.photo ?: 'https://picsum.photos/400/300?random=' ~ product.id }}" 
+                                 class="card-img-top fixed-img" 
+                                 height="200px"
+                                 width="100%"
+                                 alt="{{ product.name }}">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">
+                                <a href="{{ path('app_product_show', { 'id': product.id }) }}" class="text-decoration-none text-black">
+                                    {{ product.name }}
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted flex-grow-1">{{ product.description }}</p>
+                            <div class="mt-auto text-center">
+                                <a href="{{ path('app_product_show', { 'id': product.id }) }}" class="btn btn-primary btn-dark">
+                                    Voir le produit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ path('app_product_index') }}" class="btn btn-primary">Voir plus</a>
         </div>
     </section>
 
