@@ -13,7 +13,7 @@
         {% for product in products %}
             <div class="col-md-4">
                 <div class="card shadow-sm border-0 mb-4">
-                    <img src="https://picsum.photos/400/250?random={{ product.id }}" class="card-img-top" alt="{{ product.name }}">
+                    <img src="{{ product.photo ?: 'https://picsum.photos/400/300?random=' ~ product.id }}" class="card-img-top" alt="{{ product.name }}">
                     <div class="card-body">
                         <h5 class="card-title">
                             <a href="{{ path('app_product_show', {'id': product.id}) }}" class="text-dark text-decoration-none">

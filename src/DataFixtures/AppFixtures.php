@@ -27,6 +27,16 @@ class AppFixtures extends Fixture
         $customers = [];
         $categories = [];
         $products = [];
+
+        $admin = new User();
+        $admin->setEmail('admin@example.com')
+              ->setPassword(password_hash('adminpassword', PASSWORD_BCRYPT))
+              ->setRoles(['ROLE_ADMIN'])
+              ->setFirstName('Admin')
+              ->setLastName('User');
+        $manager->persist($admin);
+        $users[] = $admin;
+        
         for ($i = 0; $i < 150; $i++) {
             $user = new User();
             $user->setEmail($faker->unique()->email)
@@ -78,21 +88,54 @@ class AppFixtures extends Fixture
         }
 
         // Création des catégories
-        for ($i = 0; $i < 3; $i++) {
+        $categoryNames = [
+            "Portes Classiques", "Portes Mystiques & Secrètes", "Portes Thématiques", "Portes Miniatures", 
+            "Portes Célèbres", "Portes de Luxe", "Portes Futuristes", "Portes Étranges", 
+            "Portes Animales", "Portes Anciennes"
+        ];
+        
+        foreach ($categoryNames as $categoryName) {
             $category = new Category();
-            $category->setName($faker->word)
+            $category->setName($categoryName)
                 ->setDescription($faker->sentence);
-
             $manager->persist($category);
-            $categories[] = $category;
+            $categories[$categoryName] = $category;
         }
-        for ($i = 0; $i < 10; $i++) {
+        
+        $productsData = [
+            ["Porte en chêne massif", 250.00, 50, "Portes Classiques"],
+            ["Porte secrète bibliothécaire", 500.00, 20, "Portes Mystiques & Secrètes"],
+            ["Porte futuriste", 450.00, 15, "Portes Thématiques"],
+            ["Mini porte de jardin en bois", 50.00, 100, "Portes Miniatures"],
+            ["Réplique de la Porte des étoiles", 1200.00, 5, "Portes Célèbres"],
+            ["Porte en verre trempé haut de gamme", 800.00, 10, "Portes de Luxe"],
+            ["Porte connectée intelligente", 1000.00, 8, "Portes Futuristes"],
+            ["Porte asymétrique design", 600.00, 12, "Portes Étranges"],
+            ["Chatière pour animaux en aluminium", 75.00, 30, "Portes Animales"],
+            ["Vieille porte restaurée", 400.00, 7, "Portes Anciennes"],
+        ];
+        
+        $productImages = [
+            "Porte en chêne massif" => "/assets/images/chene.png",
+            "Porte secrète bibliothécaire" => "/assets/images/secrete.png",
+            "Porte futuriste" => "/assets/images/futur.png",
+            "Mini porte de jardin en bois" => "/assets/images/jardin.png",
+            "Réplique de la Porte des étoiles" => "/assets/images/etoiles.png",
+            "Porte en verre trempé haut de gamme" => "/assets/images/verre.png",
+            "Porte connectée intelligente" => "/assets/images/connectee.png",
+            "Porte asymétrique design" => "/assets/images/asymetrique.png",
+            "Chatière pour animaux en aluminium" => "/assets/images/animaux.png",
+            "Vieille porte restaurée" => "/assets/images/vielle.png"
+        ];
+        
+        foreach ($productsData as [$name, $price, $stock, $categoryName]) {
             $product = new Product();
-            $product->setName($faker->word)
+            $product->setName($name)
                 ->setDescription($faker->sentence)
-                ->setPrice($faker->randomFloat(2, 5, 500))
-                ->setStock($faker->numberBetween(10, 100))
-                ->setCategory($categories[array_rand($categories)]);
+                ->setPrice($price)
+                ->setStock($stock)
+                ->setCategory($categories[$categoryName])
+                ->setPhoto($productImages[$name] ?? "/assets/images/chene.png");
             $manager->persist($product);
             $products[] = $product;
         }
