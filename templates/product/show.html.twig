@@ -9,14 +9,12 @@
 	<div class="container py-5">
 		<div
 			class="row">
-			<!-- Image du produit -->
 			<div class="col-md-6">
 				<div class="card shadow-sm border-0">
 					<img src="{{ product.photo ?: 'https://picsum.photos/400/300?random=' ~ product.id }}" class="card-img-top img-fluid rounded" alt="{{ product.name }}">
 				</div>
 			</div>
 			
-			<!-- Détails du produit -->
 			<div class="col-md-6">
 				<div class="card shadow-sm border-0">
 					<div class="card-body">
@@ -29,7 +27,6 @@
 							{{ product.stock > 0 ? product.stock ~ ' en stock' : 'Rupture de stock' }}</p>
 						<p class="text-muted small">Ajouté le :
 							{{ product.createdAt ? product.createdAt|date('d/m/Y H:i') : 'Non disponible' }}</p>
-				<!-- Formulaire pour ajouter au panier -->
 <div class="mt-4">
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
         {% if product.stock > 0 %}
@@ -50,8 +47,45 @@
     {% else %}
         <p class="text-muted">Veuillez <a href="{{ path('login') }}" class="text-black">vous connecter</a> pour ajouter ce produit au panier.</p>
     {% endif %}
+<div class="mt-5">
+    <h3> Avis des clients </h3>
+    
+    {% if reviews is not empty %}
+        <ul class="list-group">
+            {% for review in reviews %}
+                <li class="list-group-item">
+                    <strong>{{ review.user.firstName }} {{ review.user.lastName }}</strong> 
+                    - <span class="text-warning">★ {{ review.rating }}/5</span>
+                    <p>{{ review.comment }}</p>
+                    <small class="text-muted">{{ review.createdAt|date('d/m/Y H:i') }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">Aucun avis pour ce produit.</p>
+    {% endif %}
 </div>
-						<!-- Boutons d'action -->
+
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+    <div class="mt-4">
+        <h4>Ajouter un avis</h4>
+        {{ form_start(reviewForm) }}
+            <div class="mb-3">
+                {{ form_label(reviewForm.rating, "Note (1-5)") }}
+                {{ form_widget(reviewForm.rating, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(reviewForm.comment, "Votre avis") }}
+                {{ form_widget(reviewForm.comment, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <button type="submit" class="btn btn-primary">Soumettre</button>
+        {{ form_end(reviewForm) }}
+    </div>
+{% else %}
+    <p class="text-muted">Veuillez <a href="{{ path('login') }}" class="text-black">vous connecter</a> pour laisser un avis.</p>
+{% endif %}
+
+</div>
 						<div class="mt-4">
 							<a href="{{ path('app_home') }}" class="btn btn-outline-dark">
 								<i class="bi bi-arrow-left"></i>
