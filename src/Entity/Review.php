@@ -4,30 +4,32 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\ReviewRepository;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ReviewRepository::class)]
 #[ORM\Table(name: 'reviews')]
 class Review
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private int $id;
+    private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
-    private Product $product;
+    private ?Product $product = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private User $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'integer')]
-    #[Assert\Range(min: 1, max: 5)]
-    private int $rating;
+    #[Assert\Range(min: 1, max: 5, notInRangeMessage: "La note doit être comprise entre 1 et 5.")]
+    private ?int $rating = null;
 
     #[ORM\Column(type: 'text')]
-    private string $comment;
+    #[Assert\NotBlank(message: "Le commentaire ne peut pas être vide.")]
+    private ?string $comment = null;
 
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
@@ -37,12 +39,12 @@ class Review
         $this->createdAt = new \DateTime();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProduct(): Product
+    public function getProduct(): ?Product
     {
         return $this->product;
     }
@@ -53,7 +55,7 @@ class Review
         return $this;
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -64,7 +66,7 @@ class Review
         return $this;
     }
 
-    public function getRating(): int
+    public function getRating(): ?int
     {
         return $this->rating;
     }
@@ -75,7 +77,7 @@ class Review
         return $this;
     }
 
-    public function getComment(): string
+    public function getComment(): ?string
     {
         return $this->comment;
     }
@@ -89,5 +91,10 @@ class Review
     public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
+    }
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
     }
 }

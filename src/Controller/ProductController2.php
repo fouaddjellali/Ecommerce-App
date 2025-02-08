@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\Review;
 use App\Form\ProductType;
+use App\Form\ReviewType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,8 +19,8 @@ final class ProductController2 extends AbstractController
     public function index(EntityManagerInterface $entityManager): Response
     {
         $products = $entityManager
-            ->getRepository(Product::class)
-            ->findAll();
+                ->getRepository(Product::class)
+                ->findAll();
 
         return $this->render('product/index.html.twig', [
             'products' => $products,
@@ -45,14 +47,6 @@ final class ProductController2 extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
-    public function show(Product $product): Response
-    {
-        return $this->render('product/show.html.twig', [
-            'product' => $product,
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
@@ -71,7 +65,7 @@ final class ProductController2 extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_product_delete', methods: ['POST'])]
     public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $product->getId(), $request->getPayload()->getString('_token'))) {
@@ -80,5 +74,37 @@ final class ProductController2 extends AbstractController
         }
 
         return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}', name: 'app_product_show', methods: ['GET', 'POST'])]
+    public function show(Product $product, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $reviews = $entityManager->getRepository(Review::class)->findBy(
+            ['product' => $product],
+            ['createdAt' => 'DESC']
+        );
+
+        $review = new Review();
+        $form = $this->createForm(ReviewType::class, $review);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $review->setUser($this->getUser());
+            $review->setProduct($product);
+            $review->setCreatedAt(new \DateTime());
+
+            $entityManager->persist($review);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre avis a été ajouté avec succès.');
+
+            return $this->redirectToRoute('app_product_show', ['id' => $product->getId()]);
+        }
+
+        return $this->render('product/show.html.twig', [
+            'product' => $product,
+            'reviews' => $reviews, 
+            'reviewForm' => $form->createView(),
+        ]);
     }
 }
