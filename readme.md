@@ -37,6 +37,10 @@ Une fois les services lancés, ouvrez votre navigateur et accédez à :
 ```
 http://localhost
 ```
+## 🔑 Identifiants administrateur
+Un compte administrateur est disponible pour se connecter au back-office :
+- **Email** : `admin@example.com`
+- **Mot de passe** : `adminpassword`
 
 ## 🛠 Technologies utilisées
 - Symfony
