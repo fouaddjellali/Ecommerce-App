@@ -1,0 +1,64 @@
+name: Deploy Application
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'  # Change selon ton projet
+          extensions: mbstring, pdo, intl
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install and build assets
+        run: |
+          npm install
+          npm run build
+
+      - name: Clear cache
+        run: php bin/console cache:clear --env=prod
+
+      - name: Build and push Docker images
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker-compose build
+          docker tag symfony_app ${{ secrets.DOCKER_USERNAME }}/symfony_app:latest
+          docker tag nginx_symfony ${{ secrets.DOCKER_USERNAME }}/nginx_symfony:latest
+          docker tag mysql_ecommerce ${{ secrets.DOCKER_USERNAME }}/mysql_ecommerce:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/symfony_app:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/nginx_symfony:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/mysql_ecommerce:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+            docker pull ${{ secrets.DOCKER_USERNAME }}/symfony_app:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/nginx_symfony:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/mysql_ecommerce:latest
+            docker-compose down
+            docker-compose up -d
+            docker system prune -f
