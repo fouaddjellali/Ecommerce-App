@@ -195,6 +195,21 @@
 
      
     });
+     document.addEventListener("DOMContentLoaded", function () {
+        // Écoute des notifications pour TOUS les utilisateurs
+        const eventSource = new EventSource("http://localhost:3000/.well-known/mercure?topic=notifications/global");
+
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            let notifCount = document.getElementById("notifCount");
+
+            // Met à jour le compteur de notifications
+            notifCount.textContent = parseInt(notifCount.textContent) + 1;
+
+            // Affiche une alerte avec le message
+            alert("🔔 Nouvelle notification : " + data.message);
+        };
+    });
 
 </script>
 

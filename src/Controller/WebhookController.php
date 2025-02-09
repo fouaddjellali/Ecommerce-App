@@ -19,13 +19,13 @@ class WebhookController extends AbstractController
     {
         Stripe::setApiKey($this->getParameter('stripe.secret_key'));
 
-        // Récupérer le payload Stripe
+      
         $payload = $request->getContent();
         $sigHeader = $request->headers->get('stripe-signature');
-        $webhookSecret = $this->getParameter('stripe.webhook_secret'); // Clé Webhook de Stripe (à ajouter dans .env)
+        $webhookSecret = $this->getParameter('stripe.webhook_secret'); 
 
         try {
-            // Vérifier la signature du webhook
+           
             $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $webhookSecret);
         } catch (SignatureVerificationException $e) {
             return new Response('Signature invalide', Response::HTTP_BAD_REQUEST);
@@ -33,20 +33,20 @@ class WebhookController extends AbstractController
             return new Response('Payload invalide', Response::HTTP_BAD_REQUEST);
         }
 
-        // Récupérer le type d'événement
+        
         $eventType = $event->type;
         $eventData = $event->data->object;
 
         if ($eventType === 'checkout.session.completed') {
-            // Récupérer l'ID de la session de paiement Stripe
+        
             $sessionId = $eventData->id;
             $customerEmail = $eventData->customer_email ?? 'email inconnu';
 
-            // Recherche de la commande dans la base de données
+            
             $order = $entityManager->getRepository(Order::class)->findOneBy(['stripeSessionId' => $sessionId]);
 
             if ($order) {
-                $order->setStatus('paid'); // Met à jour le statut de la commande
+                $order->setStatus('paid'); 
                 $entityManager->flush();
                 return new Response('Paiement confirmé et base de données mise à jour', Response::HTTP_OK);
             }

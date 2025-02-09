@@ -8,8 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\ChangePasswordType;
-use App\Entity\User; // Assurez-vous d'importer votre entité User
-use Doctrine\ORM\EntityManagerInterface; // Import du gestionnaire d'entités
+use App\Entity\User; 
+use Doctrine\ORM\EntityManagerInterface; 
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ChangePasswordController extends AbstractController
@@ -18,11 +18,10 @@ class ChangePasswordController extends AbstractController
     public function changePassword(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager // Injection du gestionnaire d'entités
+        EntityManagerInterface $entityManager 
     ): Response {
-        $user = $this->getUser(); // Récupérer l'utilisateur connecté
+        $user = $this->getUser(); 
 
-        // Vérifiez que l'utilisateur est une instance de votre entité User
         if (!$user instanceof User) {
             throw new AccessDeniedException('Vous devez être connecté pour changer votre mot de passe.');
         }

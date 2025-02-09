@@ -61,6 +61,7 @@ services:
     container_name: mercure
     restart: always
     environment:
+      MERCURE_ALLOW_ORIGIN: "*"
       MERCURE_PUBLISHER_JWT_KEY: "testKey"
       MERCURE_SUBSCRIBER_JWT_KEY: "testKey"
       MERCURE_EXTRA_DIRECTIVES: "cors_origins=*"

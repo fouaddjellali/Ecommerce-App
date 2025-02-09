@@ -12,12 +12,12 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // Vérifier si l'utilisateur est déjà connecté
+        
         if ($this->getUser()) {
-            return $this->redirectToRoute('home'); // Redirige vers la page d'accueil si connecté
+            return $this->redirectToRoute('home'); 
         }
 
-        // Obtenir les erreurs de connexion et le dernier email saisi
+
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 

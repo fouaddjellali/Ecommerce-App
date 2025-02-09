@@ -33,10 +33,10 @@ class UserController2 extends AbstractController
     #[Route('/update-role/{id}', name: 'user_update_role', methods: ['POST'])]
     public function updateRole(User $user, Request $request, EntityManagerInterface $entityManager): Response
     {
-        $newRoles = $request->request->all('roles'); // Récupérer tous les rôles sous forme de tableau
+        $newRoles = $request->request->all('roles'); 
 
         if (!is_array($newRoles)) {
-            $newRoles = [$newRoles]; // S'assurer que c'est bien un tableau
+            $newRoles = [$newRoles]; 
         }
 
         $user->setRoles($newRoles);

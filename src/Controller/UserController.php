@@ -57,14 +57,14 @@ final class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        $currentUser = $this->getUser(); // Récupérer l'utilisateur connecté
+        $currentUser = $this->getUser(); 
 
-        // Vérifier si l'utilisateur est connecté
+        
         if (!$currentUser) {
             throw $this->createAccessDeniedException("Vous devez être connecté pour accéder à cette page.");
         }
 
-        // Vérifier si l'ID de l'utilisateur connecté correspond à l'ID demandé
+       
         if ($currentUser->getId() !== $user->getId()) {
             throw $this->createAccessDeniedException("Accès refusé : vous ne pouvez modifier que vos propres informations.");
         }
@@ -74,7 +74,6 @@ final class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            // Redirection vers la même page après mise à jour
             return $this->redirectToRoute('app_user_edit', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
         }
 

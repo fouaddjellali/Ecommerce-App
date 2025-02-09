@@ -35,7 +35,7 @@ class StripeController extends AbstractController
                     'product_data' => [
                         'name' => $cartItem->getProduct()->getName(),
                     ],
-                    'unit_amount' => $cartItem->getProduct()->getPrice() * 100, // Convertir en centimes
+                    'unit_amount' => $cartItem->getProduct()->getPrice() * 100, 
                 ],
                 'quantity' => $cartItem->getQuantity(),
             ];
@@ -62,7 +62,7 @@ class StripeController extends AbstractController
             return $this->redirectToRoute('app_cart_user');
         }
 
-        // Créer une commande
+
         $order = new Order();
         $order->setUser($user);
         $order->setStatus('paid');
@@ -70,7 +70,7 @@ class StripeController extends AbstractController
         foreach ($cart->getItems() as $cartItem) {
             $product = $cartItem->getProduct();
 
-            // Vérifier si le produit a assez de stock
+         
             if ($product->getStock() < $cartItem->getQuantity()) {
                 $this->addFlash('error', "Stock insuffisant pour le produit: " . $product->getName());
                 return $this->redirectToRoute('app_cart_user');
@@ -90,7 +90,7 @@ class StripeController extends AbstractController
         $entityManager->persist($order);
         $entityManager->flush();
 
-        // Vider le panier après commande
+     
         foreach ($cart->getItems() as $cartItem) {
             $entityManager->remove($cartItem);
         }
