@@ -1,6 +1,6 @@
 📌 E-Commerce Portes
 
-Bienvenue sur le projet de site e-commerce dédié à la vente de portes. Ce projet est développé avec Symfony et utilise Doctrine ORM pour la gestion de la base de données.
+Bienvenue sur le projet de site e-commerce dédié à la vente de portes. Ce projet est développé avec Symfony et utilise Doctrine ORM pour la gestion de la base de données pour avoir plus de détails sur le projet il faut consulter le cahier des charges.
 
 ## 🚀 Installation
 
@@ -35,7 +35,7 @@ php bin/console doctrine:fixtures:load
 ## 🖥️ Accès au site
 Une fois les services lancés, ouvrez votre navigateur et accédez à :
 ```
-http://localhost
+http://localhost:8080
 ```
 ## 🔑 Identifiants administrateur
 Un compte administrateur est disponible pour se connecter au back-office :
@@ -46,4 +46,7 @@ Un compte administrateur est disponible pour se connecter au back-office :
 - Symfony
 - Doctrine ORM
 - Docker & Docker Compose
-- PostgreSQL (via Docker)
+- Mercure
+- MailHog
+- Nginx
+- Mysql (via Docker)
